@@ -10,7 +10,6 @@ CCFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-s
 CCFLAGS += -std=c++17 -MMD
 
 # Linking flags
-LDFLAGS += -lsfml-graphics -lsfml-audio -lsfml-window -lsfml-system
 
 # File which contains the main function
 MAINFILE := main.cpp
