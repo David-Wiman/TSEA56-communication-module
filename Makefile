@@ -3,11 +3,14 @@ SRC_DIR = src
 OBJ_DIR := build
 
 # Compiler
-CCC = g++
+CC_CPP = g++
+CC_C = gcc
 
 # Compiling flags
 CCFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -Woverloaded-virtual -fmax-errors=3 -g
 CCFLAGS += -std=c++17 -MMD
+
+CFLAGS := -Wall -Wextra -pedantic
 
 # Linking flags
 
@@ -18,21 +21,27 @@ MAINFILE := main.cpp
 OUTNAME := main.out
 
 MAINOBJ := main.o   #$(patsubst %.cpp, %.o, $(MAINFILE))
-SRCS := $(shell find $(SRC_DIR) -name '*.cpp' ! -name $(MAINFILE))
-OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-ALL_OBJS := $(OBJS) $(OBJ_DIR)/$(MAINOBJ)
+CPP_SRCS := $(shell find $(SRC_DIR) -name '*.cpp' ! -name $(MAINFILE))
+C_SRCS := $(shell find $(SRC_DIR) -name '*.c')
+CPP_OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SRCS))
+C_OBJS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRCS))
+ALL_OBJS := $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ)
 DEPS := $(patsubst %.o, %.d, $(ALL_OBJS))
 
-# Main objetice - created with 'make' or 'make main'.
+# Link the main program
 main: base $(OBJ_DIR)/$(MAINOBJ)
-	$(CCC) $(CCFLAGS) -o $(OUTNAME) $(OBJS) $(OBJ_DIR)/$(MAINOBJ) $(LDFLAGS)
+	$(CC_CPP) $(CCFLAGS) -o $(OUTNAME) $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ) $(LDFLAGS)
 
 # Compile everything except mainfile
-base: $(OBJ_DIR) $(OBJS) Makefile
+base: $(OBJ_DIR) $(CPP_OBJS) $(C_OBJS) Makefile
 
-# Main program objects
-$(OBJS) $(OBJ_DIR)/$(MAINOBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CCC) $(CCFLAGS) -c $< -o $@
+# Compile C++ objects
+$(CPP_OBJS) $(OBJ_DIR)/$(MAINOBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CC_CPP) $(CCFLAGS) -c $< -o $@
+
+# Compile C objects
+$(C_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC_C) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	@ mkdir -p $(OBJ_DIR)
