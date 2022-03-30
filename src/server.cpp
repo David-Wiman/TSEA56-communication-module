@@ -7,37 +7,59 @@ using std::string;
 using std::cout;
 using std::endl;
 
-string read_(tcp::socket & socket) {
-       boost::asio::streambuf buf;
-       boost::asio::read_until( socket, buf, "\n" );
-       string data = boost::asio::buffer_cast<const char*>(buf.data());
-       return data;
-}
-void send_(tcp::socket & socket, const string& message) {
-       const string msg = message + "\n";
-       boost::asio::write( socket, boost::asio::buffer(message) );
+//ändra "Server" till "Connection"
+
+class Connection
+{
+      public:
+            Connection(int port);
+            
+            void restart();
+            string read();
+            void write(const string& response);
+      
+      private:
+            int port;
+            boost::asio::io_service io_service;
+            tcp::acceptor acceptor;
+            tcp::socket socket;
+};
+
+int main()
+{     
+      cout << "börjar" << endl;
+      Connection connection{1234};
+      cout << "klar" << endl;
+      cout << "redo att läsa" << endl;
+      connection.read();     
+      cout << "färdigläst" << endl;
+      return 0;
 }
 
-int main() {
-      cout << "start" << endl;
-      string message = "init";
+Connection::Connection(int port)
+      :port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)}, socket{io_service}
+      {
+            acceptor.accept(socket);
+      }
+      
+void Connection::restart()
+{
       boost::asio::io_service io_service;
-//listen for new connection
-      cout << "listen for connection" << endl;
-      tcp::acceptor acceptor_(io_service, tcp::endpoint(tcp::v4(), 1234 ));
-//socket creation
-      cout << "socket creation" << endl;
-      tcp::socket socket_(io_service);
-//waiting for connection
-      cout << "wainting for connection" << endl;
-      acceptor_.accept(socket_);
-//read operation
-      cout << "read" << endl;
-      message = read_(socket_);
-      cout << message << endl;
-//write operation
-      cout << "write" << endl;
-      send_(socket_, "Hello From Server!");
-      cout << "Servent sent Hello message to Client!" << endl;
-   return 0;
+      tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port)); //listen for new connection
+      tcp::socket socket(io_service);                                   //socket creation
+      acceptor.accept(socket);                                          //waiting for connection
+}
+
+string Connection::read()
+{
+      boost::asio::streambuf buf;
+      boost::asio::read_until( socket, buf, "\n" );
+      string request = boost::asio::buffer_cast<const char*>(buf.data());
+      return request;
+}
+
+void Connection::write(const string& response)
+{
+      const string msg = response + "\n";
+      boost::asio::write( socket, boost::asio::buffer(response));
 }
