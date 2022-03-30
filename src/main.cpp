@@ -2,15 +2,15 @@
 
 extern "C" {
     #include "i2c.h"
-    void i2c_test();
 }
-
-//extern "C" void i2c_init();
 
 using namespace std;
 
 int main() {
     cout << "MAIN!" << endl;
-    i2c_test();
+    uint8_t buffer[32] = {0};
+    i2c_init();
+    i2c_set_slave_addr(0x5a);
+    i2c_write();
     return 0;
 }
