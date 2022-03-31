@@ -8,8 +8,11 @@ int main() {
     cout << "börjar" << endl;
     Connection connection{1234};
     cout << "klar" << endl;
-    cout << "redo att läsa" << endl;
-    connection.read();
-    cout << "färdigläst" << endl;
+    while (true) {
+        cout << "redo att läsa" << endl;
+        string msg = connection.read();
+        cout << "färdigläst: " << msg << endl;
+        connection.write("ett svar");
+    }
     return 0;
 }
