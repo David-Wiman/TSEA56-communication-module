@@ -37,11 +37,18 @@ void i2c_read(int16_t *buffer) {
 
 void i2c_write() {
     printf("I2C Write\n");
-    uint8_t buffer[] = {0xff, 0xf0, 0xaa, 0xab};
+    uint16_t buffer[] = {0x0123, 0x4567, 0x89ab, 0xcdef};
     int len = 4;
+    // Convert buffer with 16 bit data to one with 8 bit data
+    uint8_t buffer8[32];
+    for (int i=0; i<len; ++i) {
+        buffer8[2*i] = (uint8_t)(buffer[i] >> 8);
+        buffer8[2*i+1] = (uint8_t)(buffer[i] & 0x00ff);
+    }
+    printf("0x%x, 0x%x, 0x%x, 0x%x\n", buffer8[0], buffer8[1], buffer8[2], buffer8[3]);
     // write() returns the number of bytes actually written, if it doesn't
     // match then an error occurred (e.g. no response from the device)rite
-    if (write(file_i2c, buffer, len) != len) {
+    if (write(file_i2c, buffer8, len*2) != len*2) {
         // ERROR HANDLING: i2c transaction failed
         printf("Failed to write to the i2c bus.\n");
     }
