@@ -4,6 +4,8 @@
 
 #include "connection.h"
 #include "manualdriveinstruction.h"
+#include "drivedata.h"
+#include "log.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -13,6 +15,8 @@ bool exists(const json& j, const string& key) {
 }
 
 int main() {
+    Logger log1{"log.txt"}; //create a log
+    
     cout << "Försöker etablera kontakt" << endl;
     Connection connection{1234};
     cout << "Kontakt etablerad" << endl;
@@ -47,6 +51,9 @@ int main() {
             cout << "Instansen skapades" << endl;
             cout << "Throttle: " << inst1.get_throttle() << endl;
             cout << "Steering: " << inst1.get_steering() << endl;
+            
+            log1.log("Throttle", inst1.get_throttle());
+            log1.log("Steering", inst1.get_steering());
         }
         
         connection.write("ETT SVAR");
