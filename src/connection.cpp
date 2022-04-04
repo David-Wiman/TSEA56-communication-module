@@ -1,13 +1,10 @@
-#include <iostream>
+#include <string>
 #include <boost/asio.hpp>
 
 #include "connection.h"
 
 using namespace boost::asio;
 using ip::tcp;
-using std::string;
-using std::cout;
-using std::endl;
 
 /* Establish a connection on specified port, not done until a client respondes */
 Connection::Connection(int port)
@@ -25,15 +22,15 @@ void Connection::restart() {
 }
 
 /* Recieve a string from the client */
-string Connection::read() {
+std::string Connection::read() {
       boost::asio::streambuf buf;
       boost::asio::read_until( socket, buf, "\n" );
-      string request = boost::asio::buffer_cast<const char*>(buf.data());
+      std::string request = boost::asio::buffer_cast<const char*>(buf.data());
       return request;
 }
 
 /* Send a string to the client */
-void Connection::write(const string& response) {
-      const string msg = response + "\n";
+void Connection::write(const std::string& response) {
+      const std::string msg = response + "\n";
       boost::asio::write( socket, boost::asio::buffer(response));
 }

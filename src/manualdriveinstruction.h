@@ -1,8 +1,6 @@
 #ifndef MANUALDRIVEINSTRUCTION_H
 #define MANUALDRIVEINSTRUCTION_H
 
-#include <string>
-#include <boost/asio.hpp>
 #include <json.hpp>
 
 class ManualDriveInstruction {

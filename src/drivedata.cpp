@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "drivedata.h"
 
 DriveData::DriveData(int time, float throttle, float steering,
