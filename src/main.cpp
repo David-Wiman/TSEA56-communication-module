@@ -22,9 +22,9 @@ int main() {
         string msg{};
         try {
             msg = connection.read();
-        } catch (std::exception& e) {
+        } catch (boost::exception&) {
             cout << "Lost connection" << endl;
-            return 1;
+            break;
         }
         
         cout << "Mottaget: " << msg << endl;
