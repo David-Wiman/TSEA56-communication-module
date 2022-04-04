@@ -9,13 +9,14 @@ using std::string;
 using std::cout;
 using std::endl;
 
-
+// establish a connection on specified port, not done until a client respondes
 Connection::Connection(int port)
 : port{port}, io_service{},
   acceptor{io_service, tcp::endpoint(tcp::v4(), port)}, socket{io_service} {
       acceptor.accept(socket);
 }
 
+// reestablishe connection, same operations as in constructor
 void Connection::restart() {
       boost::asio::io_service io_service;
       tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port)); // listen for new connection
@@ -23,6 +24,7 @@ void Connection::restart() {
       acceptor.accept(socket);  // waiting for connection
 }
 
+// recieve a string from the client
 string Connection::read() {
       boost::asio::streambuf buf;
       boost::asio::read_until( socket, buf, "\n" );
@@ -30,6 +32,7 @@ string Connection::read() {
       return request;
 }
 
+// send a string to the client
 void Connection::write(const string& response) {
       const string msg = response + "\n";
       boost::asio::write( socket, boost::asio::buffer(response));
