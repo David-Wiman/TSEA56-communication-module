@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/asio.hpp>
 #include <json.hpp>
 
 #include "connection.h"
@@ -17,10 +18,25 @@ int main() {
     cout << "Kontakt etablerad" << endl;
     while (true) {
         cout << "Redo att läsa" << endl;
-        string msg = connection.read();
+        
+        string msg{};
+        try {
+            msg = connection.read();
+        } catch (std::exception& e) {
+            cout << "Lost connection" << endl;
+            return 1;
+        }
+        
         cout << "Mottaget: " << msg << endl;
         cout << "Gör om till JSON-objekt" << endl;
-        json j = json::parse(msg);
+        
+        json j{};
+        try {
+            j = json::parse(msg);
+        } catch (std::invalid_argument&) {
+            cout << "Invalid argument" << endl;
+        }
+        
         cout << "JSON-objekt: " << j << endl;
         bool is_ManualDriveInstruction = exists(j, "ManualDriveInstruction");
         cout << "Finns key ManualDriveInstruction?: " << is_ManualDriveInstruction << endl;     
@@ -33,7 +49,7 @@ int main() {
             cout << "Steering: " << inst1.get_steering() << endl;
         }
         
-        connection.write("ett svar");
+        connection.write("ETT SVAR");
     }
     return 0;
 }
