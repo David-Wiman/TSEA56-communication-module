@@ -1,29 +1,12 @@
 #include <iostream>
-#include <boost/asio.hpp>
-#include <json.hpp>
 
 #include "drivedata.h"
 
-using namespace boost::asio;
-using json = nlohmann::json;
-using ip::tcp;
-using std::string;
-using std::cout;
-using std::endl;
-
-
-DriveData::DriveData(const json& j)
-:time{0}, throttle{0}, steering{0}, driven_distance{0},
-      obsticle_distance{0}, lateral_position{0}, angle{0} {   
-      time = *j["DriveData"].find("time");
-      throttle = *j["DriveData"].find("throttle");
-      steering = *j["DriveData"].find("steering");
-      driven_distance = *j["DriveData"].find("driven_distance");
-      obsticle_distance = *j["DriveData"].find("obsicle_distance");
-      lateral_position = *j["DriveData"].find("lateral_position");
-      angle = *j["DriveData"].find("angle");
+DriveData::DriveData(int time, float throttle, float steering,
+      float driven_distance, int obsticle_distance, int lateral_position, float angle)
+:time{time}, throttle{throttle}, steering{steering}, driven_distance{driven_distance},
+      obsticle_distance{obsticle_distance}, lateral_position{lateral_position}, angle{angle} {
 }
-
 
 int DriveData::get_time() {
       return time;
@@ -52,4 +35,3 @@ int DriveData::get_lateral_position() {
 float DriveData::get_angle() {
       return angle;
 }
-

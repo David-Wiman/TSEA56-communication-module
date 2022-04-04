@@ -1,14 +1,11 @@
 #ifndef DRIVEDATA_H
 #define DRIVEDATA_H
 
-#include <string>
-#include <boost/asio.hpp>
-#include <json.hpp>
-
 class DriveData {
 public:
-    DriveData(const nlohmann::json& j);
-    
+    DriveData(int time, float throttle, float steering,
+          float driven_distance, int obsticle_distance, int lateral_position, float angle);
+
     int get_time();
     float get_throttle();
     float get_steering();

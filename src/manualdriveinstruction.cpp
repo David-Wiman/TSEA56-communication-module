@@ -13,11 +13,10 @@ using std::endl;
 
 
 ManualDriveInstruction::ManualDriveInstruction(const json& j)
-:throttle{0}, steering{0} { 
+:throttle{0}, steering{0} {
     throttle = *j["ManualDriveInstruction"].find("throttle");
     steering = *j["ManualDriveInstruction"].find("steering");
 }
-
 
 float ManualDriveInstruction::get_throttle() {
       return throttle;
