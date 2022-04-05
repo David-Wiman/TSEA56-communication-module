@@ -12,10 +12,12 @@ int main(void){
     // Enable global interrupts
     sei();
 
-    I2C_init();
+    I2C_init(0x50);
 
     uint16_t message_names[16];
     uint16_t messages[16];
+
+    I2C_pack(message_names, messages, 2);
 
     while (true) {
         if (i2c_new_data) {

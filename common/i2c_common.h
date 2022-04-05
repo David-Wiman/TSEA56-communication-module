@@ -5,7 +5,7 @@
  *
  * Data is lost if num uses more than 14 bits. */
 inline uint16_t package_signed(int16_t num) {
-	return num & 0x7fff;
+    return num & 0x7fff;
 }
 
 /* Restore the signed form of an integer sent over the i2c bus. */
@@ -22,5 +22,11 @@ struct steering_struct {
     const uint16_t REF_LAT;
     const uint16_t CUR_ANG;
 } STEERING = {0xfff0, 0xfff1, 0xfff2, 0xfff3, 0xfff4, 0xfff5, 0xfff6};
+
+struct sensor_struct {
+    const uint16_t OBSTACLE_DISTANCE;
+    const uint16_t DRIVING_DISTANCE;
+    const uint16_t SPEED;
+} SENSOR = {0xfff0, 0xfff1, 0xfff2};
 
 #endif  // COMMON_H

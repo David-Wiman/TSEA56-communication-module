@@ -17,15 +17,17 @@
 volatile uint8_t i2c_in_buffer[32];
 volatile int i2c_in_ptr = 0;
 
-void I2C_init() {
-    TWAR = 0x50 << 1;  // Set slave address
+void I2C_init(uint8_t slave_address) {
+    TWAR = slave_address << 1;  // Set slave address
     // Start Slave Listening: Clear TWINT Flag, Enable ACK, Enable TWI, TWI Interrupt Enable
     TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
 
-	// Default initial values
+    // Default initial values
     TWDR = 0x00;
-	i2c_new_data = false;
+    i2c_new_data = false;
 }
+
+void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {}
 
 int I2C_unpack(uint16_t *message_names, uint16_t *messages) {
     // The arrays must be long enough for all possible message types
