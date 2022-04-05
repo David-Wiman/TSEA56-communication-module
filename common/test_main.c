@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "avr_i2c.h"
+#include "i2c_common.h"
 
 int main(void){
 
@@ -21,7 +22,8 @@ int main(void){
             i2c_new_data = false;
             int len = I2C_unpack(message_names, messages);
             for (int i=0; i<len; ++i) {
-                printf(message_names[i], messages[i]);
+                volatile int16_t val = restore_signed(messages[i]);
+                printf(message_names[i], val);
             }
         }
     }
