@@ -1,5 +1,5 @@
-#ifndef STEERING_CONSTANTS_H
-#define STEERING_CONSTANTS_H
+#ifndef COMMON_H
+#define COMMON_H
 
 /* Package signed value before sending it on the 12c bus.
  *
@@ -14,13 +14,13 @@ inline int16_t restore_signed(uint16_t num) {
 }
 
 struct steering_struct {
-    const short int MANUAL_GAS;
-    const short int MANUAL_ANG;
-    const short int CUR_VEL;
-    const short int REF_VEL;
-    const short int CUR_LAT;
-    const short int REF_LAT;
-    const short int CUR_ANG;
+    const uint16_t MANUAL_GAS;
+    const uint16_t MANUAL_ANG;
+    const uint16_t CUR_VEL;
+    const uint16_t REF_VEL;
+    const uint16_t CUR_LAT;
+    const uint16_t REF_LAT;
+    const uint16_t CUR_ANG;
 } STEERING = {0xfff0, 0xfff1, 0xfff2, 0xfff3, 0xfff4, 0xfff5, 0xfff6};
 
-#endif  // STEERING_CONSTANTS_H_
+#endif  // COMMON_H

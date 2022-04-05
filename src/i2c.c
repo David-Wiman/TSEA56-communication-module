@@ -49,9 +49,15 @@ void i2c_write(uint16_t *buffer, int len) {
     printf("\n");
     // write() returns the number of bytes actually written, if it doesn't
     // match then an error occurred (e.g. no response from the device)rite
-    if (write(file_i2c, buffer8, len*2) != len*2) {
+    int writen_bytes = write(file_i2c, buffer8, len*2);
+    if (writen_bytes != len*2) {
         // ERROR HANDLING: i2c transaction failed
-        printf("Failed to write to the i2c bus.\n");
+        if (writen_bytes != -1) {
+            printf("Error while writing on i2c bus: Only %d/%d bytes writen\n", 
+                    writen_bytes, len*2);
+        } else {
+            printf("Error while writing on i2c bus (code -1)\n");
+        }
     }
 }
 
