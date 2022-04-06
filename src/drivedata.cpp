@@ -33,3 +33,16 @@ int DriveData::get_lateral_position() {
 float DriveData::get_angle() {
       return angle;
 }
+
+std::string DriveData::format_json() {
+      std::ostringstream oss;
+      oss << "{\"DriveData\": {\"time\": " << time
+          << ", \"throttle\": " << throttle
+          << ", \"steering\": " << steering
+          << ", \"driven_distance\": " << driven_distance
+          << ", \"obsticle_distance\": " << obsticle_distance
+          << ", \"lateral_position\": " << lateral_position
+          << ", \"angle\": " << angle << "}}" ;
+      std::string msg = oss.str();
+      return msg;
+}
