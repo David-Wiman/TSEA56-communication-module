@@ -13,20 +13,16 @@ inline int16_t restore_signed(uint16_t num) {
     return (int16_t)(((num & 0x4000) << 1) | num);
 }
 
-struct steering_struct {
-    const uint16_t MANUAL_GAS;
-    const uint16_t MANUAL_ANG;
-    const uint16_t CUR_VEL;
-    const uint16_t REF_VEL;
-    const uint16_t CUR_LAT;
-    const uint16_t REF_LAT;
-    const uint16_t CUR_ANG;
-} STEERING = {0xfff0, 0xfff1, 0xfff2, 0xfff3, 0xfff4, 0xfff5, 0xfff6};
+#define STEERING_MANUAL_GAS 0xfff0
+#define STEERING_MANUAL_ANG 0xfff1
+#define STEERING_CUR_VEL    0xfff2
+#define STEERING_REF_VEL    0xfff3
+#define STEERING_CUR_LAT    0xfff4
+#define STEERING_REF_LAT    0xfff5
+#define STEERING_CUR_ANG    0xfff6
 
-struct sensor_struct {
-    const uint16_t OBSTACLE_DISTANCE;
-    const uint16_t DRIVING_DISTANCE;
-    const uint16_t SPEED;
-} SENSOR = {0xfff0, 0xfff1, 0xfff2};
+#define SENSOR_OBSTACLE_DISTANCE 0xfff0
+#define SENSOR_DRIVING_DISTANCE  0xfff1
+#define SENSOR_SPEED             0xfff2
 
 #endif  // COMMON_H
