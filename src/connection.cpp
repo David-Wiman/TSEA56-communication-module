@@ -1,5 +1,3 @@
-/* Written by David Wiman, 6/4 -22 */
-
 #include "connection.h"
 
 using namespace boost::asio;
@@ -30,11 +28,21 @@ void Connection::restart() {
 /* Recieve a string from the client, set new_instruction, create instruction object */
 void Connection::read() {
       try {
+            // Conotinously read until newline, create json object from string
             boost::asio::streambuf buf;
             boost::asio::read_until( socket, buf, "\n" );
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
-            json j = json::parse(request);
             
+            json j{};
+            try {
+                  j = json::parse(request);
+            } catch (std::invalid_argument&) {
+                  std::cout << "invalid argument" << std::endl;
+                  return;
+            }
+            
+            
+            // Check what kind of instruction and create instance of appropriate class
             if (exists(j, "ManualDriveInstruction")) {
                   manual_instruction = true;
                   ManualDriveInstruction inst{j};
@@ -59,7 +67,7 @@ void Connection::write(const std::string& response) {
       boost::asio::write( socket, boost::asio::buffer(response));
 }
 
-/* New */
+/* Functions to check if a new value exists*/
 bool Connection::new_manual_instruction() {
       return manual_instruction;
 }
@@ -72,7 +80,7 @@ bool Connection::new_auto_instruction() {
       return auto_instruction;
 }
 
-/* Getters */
+/* Gettersn, sets new-values to false*/
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
       manual_instruction = false;
       return manual_drive_instruction;
