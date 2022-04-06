@@ -25,14 +25,33 @@ void i2c_set_slave_addr(int slave_addr) {
     }
 }
 
-void i2c_read(int16_t *buffer) {
-    int len = 2;  // We always send 2 bytes
-    if (read(file_i2c, buffer, len) != len) {
+int i2c_read(uint16_t *message_names, uint16_t *messages) {
+    uint8_t buffer8[32];
+    int code = read(file_i2c, buffer8, 1);
+    int len = 0;
+    if (code == 1) {
+        len = buffer8[0];
+        printf("Slave wants to transmit %d bytes\n", len);
+    } else {
+        printf("Failed to get message length (code %d)\n", code);
+        return -1;
+    }
+
+    code = read(file_i2c, buffer8, len);
+    if (code == -1) {
         // ERROR HANDLING: i2c transaction failed
         printf("Failed to read from the i2c bus.\n");
+    } else if (code == len) {
+        printf("Read %d bytes: ", code);
+        for (int i=0; i<code; ++i) {
+            printf("%x ", buffer8[i]);
+        }
+        printf("\n");
     } else {
-        printf("Data read: %s\n", buffer);
+        printf("Failed to read from i2c bus. ");
+        printf("Only read %d of %d bytes.\n", code, len);
     }
+    return code;
 }
 
 void i2c_write(uint16_t *buffer, int len) {

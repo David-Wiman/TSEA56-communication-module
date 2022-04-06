@@ -21,6 +21,9 @@ int main() {
         STEERING_MANUAL_ANG, package_signed(steer)
     };
     int len = 4;
-    i2c_write(buffer, len);
+    //i2c_write(buffer, len);
+    uint16_t message_names[16];
+    uint16_t messages[16];
+    i2c_read(message_names, messages);
     return 0;
 }
