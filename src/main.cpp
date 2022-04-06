@@ -17,12 +17,9 @@ bool exists(const json& j, const string& key) {
 int main() {
     Logger log1{"log.txt"}; //create a log
     
-    cout << "Försöker etablera kontakt" << endl;
     Connection connection{1234};
-    cout << "Kontakt etablerad" << endl;
+    
     while (true) {
-        cout << "Redo att läsa" << endl;
-        
         string msg{};
         try {
             msg = connection.read();
@@ -30,10 +27,7 @@ int main() {
             cout << "Lost connection" << endl;
             break;
         }
-        
-        cout << "Mottaget: " << msg << endl;
-        cout << "Gör om till JSON-objekt" << endl;
-        
+                
         json j{};
         try {
             j = json::parse(msg);
@@ -41,22 +35,19 @@ int main() {
             cout << "Invalid argument" << endl;
         }
         
-        cout << "JSON-objekt: " << j << endl;
-        bool is_ManualDriveInstruction = exists(j, "ManualDriveInstruction");
-        cout << "Finns key ManualDriveInstruction?: " << is_ManualDriveInstruction << endl;     
-        
-        if (is_ManualDriveInstruction) {
-            cout << "Försöker göra en instans av ManualDriveInstruction" << endl;
+        if (exists(j, "ManualDriveInstruction")) {
             ManualDriveInstruction inst1(j);
-            cout << "Instansen skapades" << endl;
             cout << "Throttle: " << inst1.get_throttle() << endl;
             cout << "Steering: " << inst1.get_steering() << endl;
             
             log1.log("Throttle", inst1.get_throttle());
             log1.log("Steering", inst1.get_steering());
-        }
+        } else if (exists(j, "ManualDriveInstruction")) {
+            
         
-        connection.write("ETT SVAR");
-    }
+        connection.write("Acknowledge");
+    
     return 0;
 }
+    
+   
