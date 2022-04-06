@@ -12,7 +12,7 @@ using json = nlohmann::json;
 int main() {
     Connection connection{1234};
     
-    while (true) {        
+    while (true) {
         connection.read();
         
         if (connection.new_manual_instruction()) {
