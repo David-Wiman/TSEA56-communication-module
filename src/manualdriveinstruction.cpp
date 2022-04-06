@@ -4,6 +4,9 @@
 
 using json = nlohmann::json;
 
+ManualDriveInstruction::ManualDriveInstruction()
+:throttle{0}, steering{0} {}
+
 ManualDriveInstruction::ManualDriveInstruction(const json& j)
 :throttle{0}, steering{0} {
     throttle = *j["ManualDriveInstruction"].find("throttle");

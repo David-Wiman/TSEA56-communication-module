@@ -5,6 +5,7 @@
 
 class ManualDriveInstruction {
 public:
+    ManualDriveInstruction();
     ManualDriveInstruction(const nlohmann::json& j);
     
     float get_throttle();
