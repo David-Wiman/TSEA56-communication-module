@@ -25,5 +25,6 @@ int main() {
     uint16_t message_names[16];
     uint16_t messages[16];
     i2c_read(message_names, messages);
+    i2c_close();
     return 0;
 }

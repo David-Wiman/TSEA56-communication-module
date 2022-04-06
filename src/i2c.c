@@ -17,6 +17,10 @@ void i2c_init() {
     }
 }
 
+void i2c_close() {
+    close(file_i2c);
+}
+
 void i2c_set_slave_addr(int slave_addr) {
     if (ioctl(file_i2c, I2C_SLAVE, slave_addr) < 0) {
         printf("Failed to set slave address\n");
