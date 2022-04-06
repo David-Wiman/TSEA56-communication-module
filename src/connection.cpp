@@ -19,7 +19,7 @@ Connection::Connection(int port)
       acceptor.accept(socket);
 }
 
-/* Reestablishe connection, same operations as in constructor */
+/* Reestablish connection, same operations as in constructor */
 void Connection::restart() {
       boost::asio::io_service io_service;
       tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port)); // listen for new connection

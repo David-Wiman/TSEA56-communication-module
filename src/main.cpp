@@ -2,6 +2,7 @@
 #include <boost/asio.hpp>
 #include <json.hpp>
 
+#include "drivedata.h"
 #include "connection.h"
 #include "manualdriveinstruction.h"
 
@@ -19,7 +20,10 @@ int main() {
             cout << "Recieved throttle: " << instruction.get_throttle() << endl;
             cout << "Recieved steering: " << instruction.get_steering() << endl;
         }
-        connection.write("Acknowledge");
+        
+        DriveData drivedata{1,2,3,4,5,6,7};
+        string return_msg = drivedata.format_json();
+        connection.write(return_msg);
     }
     return 0;
 }
