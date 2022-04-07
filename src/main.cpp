@@ -15,7 +15,7 @@ bool exists(const json& j, const string& key) {
 }
 
 int main() {
-    Logger log1{"log.txt"}; //create a log
+    Logger log{"log.txt"}; //create a log
     
     Connection connection{1234};
     
@@ -40,12 +40,13 @@ int main() {
             cout << "Throttle: " << inst1.get_throttle() << endl;
             cout << "Steering: " << inst1.get_steering() << endl;
             
-            log1.log("Throttle", inst1.get_throttle());
-            log1.log("Steering", inst1.get_steering());
-        } else if (exists(j, "ManualDriveInstruction")) {
+            log.log(INFO, "User interface", "Throttle", inst1.get_throttle());
+            log.log(DEBUG, "User interface", "Steering", inst1.get_steering());
+        }
             
         
         connection.write("Acknowledge");
+    }
     
     return 0;
 }
