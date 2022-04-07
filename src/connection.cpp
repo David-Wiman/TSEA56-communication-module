@@ -4,6 +4,8 @@
 
 using namespace boost::asio;
 using ip::tcp;
+using std::cout;
+using std::endl;
 
 /* Check if a given key exists in an json object */
 bool exists(const json& j, const std::string& key) {
@@ -12,11 +14,12 @@ bool exists(const json& j, const std::string& key) {
 
 /* Establish a connection on specified port, not done until a client respondes */
 Connection::Connection(int port)
-: port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(),
-  port)},socket{io_service}, manual_instruction{false},
-  semi_instruction{false}, auto_instruction{false},
-  manual_drive_instruction{}, semi_drive_instruction{}, auto_drive_instruction{} {
+: port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)}, 
+  socket{io_service}, manual_instruction{false}, semi_instruction{false}, 
+  auto_instruction{false}, manual_drive_instruction{}, semi_drive_instruction{}, 
+  auto_drive_instruction{}, thread{} {
     acceptor.accept(socket);
+    thread = new std::thread(&Connection::read, this);
 }
 
 /* Reestablish connection, same operations as in constructor */
@@ -29,36 +32,42 @@ void Connection::restart() {
 
 /* Recieve a string from the client, set new_instruction, create instruction object */
 void Connection::read() {
-    try {
-        // Continuously read until newline, create json object from string
-        boost::asio::streambuf buf;
-        boost::asio::read_until( socket, buf, "\n" );
-        std::string request = boost::asio::buffer_cast<const char*>(buf.data());
-
-        json j{};
+    while (true) {
+        cout << "Read new" << endl;
         try {
-            j = json::parse(request);
-        } catch (std::invalid_argument&) {
-            std::cout << "invalid argument" << std::endl;
-            return;
-        }
+            // Continuously read until newline, create json object from string
+            boost::asio::streambuf buf;
+            boost::asio::read_until( socket, buf, "\n" );
+            std::string request = boost::asio::buffer_cast<const char*>(buf.data());
 
-        // Check what kind of instruction and create instance of appropriate class
-        if (exists(j, "ManualDriveInstruction")) {
-            manual_instruction = true;
-            ManualDriveInstruction inst{j};
-            manual_drive_instruction = inst;
-        } else if (exists(j, "SemiDriveInstruction")) {
-            semi_instruction = true;
-            SemiDriveInstruction inst{j};
-            semi_drive_instruction = inst;
-        } else if (exists(j, "AutoDriveInstruction")) {
-            auto_instruction = true;
-            AutoDriveInstruction inst{j};
-            auto_drive_instruction = inst;
+            json j{};
+            try {
+                j = json::parse(request);
+            } catch (std::invalid_argument&) {
+                std::cout << "invalid argument" << std::endl;
+                return;
+            }
+
+            // Check what kind of instruction and create instance of appropriate class
+            if (exists(j, "ManualDriveInstruction")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                manual_instruction.store(true);
+                ManualDriveInstruction inst{j};
+                manual_drive_instruction = inst;
+            } else if (exists(j, "SemiDriveInstruction")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                semi_instruction.store(true);
+                SemiDriveInstruction inst{j};
+                semi_drive_instruction = inst;
+            } else if (exists(j, "AutoDriveInstruction")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                auto_instruction.store(true);
+                AutoDriveInstruction inst{j};
+                auto_drive_instruction = inst;
+            }
+        } catch (const boost::exception&) {
+            throw LostConnectionError();
         }
-    } catch (const boost::exception&) {
-        throw LostConnectionError();
     }
 }
 
@@ -70,29 +79,32 @@ void Connection::write(const std::string& response) {
 
 /* Functions to check if a new value exists*/
 bool Connection::new_manual_instruction() {
-    return manual_instruction;
+    return manual_instruction.load();
 }
 
 bool Connection::new_semi_instruction() {
-    return semi_instruction;
+    return semi_instruction.load();
 }
 
 bool Connection::new_auto_instruction() {
-    return auto_instruction;
+    return auto_instruction.load();
 }
 
 /* Gettersn, sets new-values to false*/
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
-    manual_instruction = false;
+    std::lock_guard<std::mutex> lk(mtx);
+    manual_instruction.store(false);
     return manual_drive_instruction;
 }
 
 SemiDriveInstruction Connection::get_semi_drive_instruction() {
-    semi_instruction = false;
+    std::lock_guard<std::mutex> lk(mtx);
+    semi_instruction.store(false);
     return semi_drive_instruction;
 }
 
 AutoDriveInstruction Connection::get_auto_drive_instruction() {
-    auto_instruction = false;
+    std::lock_guard<std::mutex> lk(mtx);
+    auto_instruction.store(false);
     return auto_drive_instruction;
 }

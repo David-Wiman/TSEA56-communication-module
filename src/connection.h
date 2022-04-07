@@ -4,6 +4,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <json.hpp>
+#include <atomic>
 
 #include "manualdriveinstruction.h"
 #include "semidriveinstruction.h"
@@ -24,7 +25,6 @@ public:
 
     /* Basic function */
     void restart();
-    void read();
     void write(const std::string& response);
 
     /* New-functions */
@@ -38,6 +38,8 @@ public:
     AutoDriveInstruction get_auto_drive_instruction();
 
 private:
+    void read();
+
     /* Variables for socket connection */
     int port;
     boost::asio::io_service io_service;
@@ -45,15 +47,18 @@ private:
     boost::asio::ip::tcp::socket socket;
 
     /* Variables to check if a new instructions has come */
-    bool manual_instruction;
-    bool semi_instruction;
-    bool auto_instruction;
+    std::atomic<bool> manual_instruction;
+    std::atomic<bool> semi_instruction;
+    std::atomic<bool> auto_instruction;
 
     /* Variables to return upon request */
     ManualDriveInstruction manual_drive_instruction;
     SemiDriveInstruction semi_drive_instruction;
     AutoDriveInstruction auto_drive_instruction;
 
+    /* Threading */
+    std::thread *thread;
+    std::mutex mtx;
 };
 
 #endif  // CONNECTION_H
