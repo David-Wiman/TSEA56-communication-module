@@ -36,6 +36,8 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
     if (code == 1) {
         len = buffer8[0];
         printf("Slave wants to transmit %d bytes\n", len);
+        if (len > 16)
+            printf("Warning: Slave wants to transmit too many bytes.\n");
     } else {
         printf("Failed to get message length (code %d)\n", code);
         return -1;
@@ -46,11 +48,16 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
         // ERROR HANDLING: i2c transaction failed
         printf("Failed to read from the i2c bus.\n");
     } else if (code == len) {
-        printf("Read %d bytes: ", code);
-        for (int i=0; i<code; ++i) {
-            printf("%x ", buffer8[i]);
+        int j = 0;
+        for (int i=0; i<code; i+=2) {
+            uint16_t message = (uint16_t)(buffer8[i]<<8) | buffer8[i+1];
+            if ((message & 0xfff0) == 0xfff0) {
+                message_names[j] = message;
+            } else {
+                messages[j++] = message;
+            }
         }
-        printf("\n");
+        return j;
     } else {
         printf("Failed to read from i2c bus. ");
         printf("Only read %d of %d bytes.\n", code, len);
