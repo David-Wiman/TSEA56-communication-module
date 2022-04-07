@@ -14,9 +14,9 @@ ManualDriveInstruction::ManualDriveInstruction(const json& j)
 }
 
 float ManualDriveInstruction::get_throttle() {
-      return throttle;
+    return throttle;
 }
 
 float ManualDriveInstruction::get_steering() {
-      return steering;
+    return steering;
 }

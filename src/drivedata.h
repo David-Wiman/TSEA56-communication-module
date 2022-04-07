@@ -9,8 +9,8 @@ using json = nlohmann::json;
 
 class DriveData {
 public:
-    DriveData(int time, float throttle, float steering,
-          float driven_distance, int obsticle_distance, int lateral_position, float angle);
+    DriveData(int time, float throttle, float steering, float driven_distance,
+              int obsticle_distance, int lateral_position, float angle);
 
     int get_time();
     float get_throttle();
@@ -19,7 +19,7 @@ public:
     int get_obsticle_distance();
     int get_lateral_position();
     float get_angle();
-    
+
     std::string format_json();
 
 private:
