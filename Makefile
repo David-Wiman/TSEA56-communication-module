@@ -6,15 +6,11 @@ OBJ_DIR := build
 CC_CPP = g++
 CC_C = gcc
 
-# Other include directories with headers
-INC := -Icommon -Ijson/single_include/nlohmann
-
 # Compiling flags
-CPPFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -Woverloaded-virtual -fmax-errors=3 -g
-CPPFLAGS += -std=c++17 -MMD $(INC)
+CCFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -Woverloaded-virtual -fmax-errors=3 -g
+CCFLAGS += -std=c++17 -MMD
 
 CFLAGS := -Wall -Wextra -pedantic
-CFLAGS += $(INC)
 
 # Linking flags
 LDFLAGS += -lboost_system -lpthread
@@ -35,14 +31,14 @@ DEPS := $(patsubst %.o, %.d, $(ALL_OBJS))
 
 # Link the main program
 main: base $(OBJ_DIR)/$(MAINOBJ)
-	$(CC_CPP) $(CPPFLAGS) -o $(OUTNAME) $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ) $(LDFLAGS)
+	$(CC_CPP) $(CCFLAGS) -o $(OUTNAME) $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ) $(LDFLAGS)
 
 # Compile everything except mainfile
 base: $(OBJ_DIR) $(CPP_OBJS) $(C_OBJS) Makefile
 
 # Compile C++ objects
 $(CPP_OBJS) $(OBJ_DIR)/$(MAINOBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC_CPP) $(CPPFLAGS) -c $< -o $@
+	$(CC_CPP) $(CCFLAGS) -c $< -o $@
 
 # Compile C objects
 $(C_OBJS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
