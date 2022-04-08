@@ -21,8 +21,8 @@ int main() {
     cout << "Start" << endl;
 
     // Initiate
+    Logger::init();
     i2c_init();
-    Logger logger{"log/log.txt"};
     Connection connection{1234};
 
     while (true) {
@@ -30,8 +30,8 @@ int main() {
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
             
-            logger.log(INFO, "User interface", "Throttle", instruction.get_throttle());
-            logger.log(DEBUG, "User interface", "Steering", instruction.get_steering());
+            Logger::log(INFO, "User interface", "Throttle", instruction.get_throttle());
+            Logger::log(DEBUG, "User interface", "Steering", instruction.get_steering());
 
             // Send on bus
             i2c_set_slave_addr(0x51);

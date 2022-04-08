@@ -6,17 +6,19 @@
 #include <string>
 
 enum severity{INFO, DEBUG, WARNING, ERROR};
+static const char * EnumStrings[] = { "INFO", "DEBUG", "WARNING", "ERROR" };
 
 class Logger {
 public:
-	Logger(std::string filename);
-	~Logger();
+	static void init();
+	static void close();
 	
-	void log(int serverity, std::string origin, std::string type, float value);
-	void log(int serverity, std::string origin, std::string type, std::string value);
+	static void log(int serverity, std::string origin, std::string type, float value);
+	static void log(int serverity, std::string origin, std::string type, std::string value);
 
 private:
-	std::fstream logstream;
+	Logger() {}
+	static std::fstream logstream;
 
 };
 

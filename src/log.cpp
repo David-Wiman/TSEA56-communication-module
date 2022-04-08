@@ -5,20 +5,22 @@
 #include <iomanip>
 #include <fstream>
 #include <stdexcept>
-#include <ctime> 
+#include <ctime>
+
+std::fstream Logger::logstream{};
 
 /* Create and open log file, log time */
-Logger::Logger(std::string filename): logstream{} {
-	logstream.open(filename, std::ios::app);
+void Logger::init() {
+	logstream.open("log/log.txt", std::ios::app);
 	if (!logstream) {
 		throw std::runtime_error("Could not open file");
 	}
-	time_t now = time(nullptr) ;
+	time_t now = time(nullptr);
 	logstream << "\n" << std::put_time(localtime(&now), "%T") << " Log started " << std::endl;
 }
 
-/* Close the log file upon destruction */
-Logger::~Logger() {
+/* Close dsafthe log file upon destruction */
+void Logger::close() {
 	logstream.close();
 }
 
@@ -29,7 +31,5 @@ void Logger::log(int severity, std::string origin, std::string type, float value
 
 void Logger::log(int severity, std::string origin, std::string type, std::string value) {
 	time_t now = time(nullptr) ;
-	logstream << std::put_time(localtime(&now), "%T") << " " << severity << ", " << origin << ", " << type << ": " << value << std::endl;
+	logstream << std::put_time(localtime(&now), "%T") << ", " << EnumStrings[severity] << ", " << origin << ", " << type << ": " << value << std::endl;
 }
-
-
