@@ -1,26 +1,58 @@
 #include <iostream>
+#include <boost/asio.hpp>
+#include <json.hpp>
+
 #include "i2c_common.h"
+#include "drivedata.h"
+#include "connection.h"
+#include "manualdriveinstruction.h"
 
 extern "C" {
     #include "i2c.h"
 }
 
 using namespace std;
+using json = nlohmann::json;
 
 int main() {
-    cout << "MAIN!" << endl;
+    cout << "Start" << endl;
+
+    // Initiate
     i2c_init();
-    i2c_set_slave_addr(0x50);
+    Connection connection{1234};
 
-    cout << "Labels: " << STEERING_MANUAL_GAS << " " << STEERING_MANUAL_ANG << endl;
+    while (true) {
 
-    int16_t gas = 10;
-    int16_t steer = -2;
-    uint16_t buffer[] = {
-        STEERING_MANUAL_GAS, package_signed(gas),
-        STEERING_MANUAL_ANG, package_signed(steer)
-    };
-    int len = 4;
-    i2c_write(buffer, len);
+        if (connection.new_manual_instruction()) {
+            ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
+            cout << "Recieved throttle: " << instruction.get_throttle() << endl;
+            cout << "Recieved steering: " << instruction.get_steering() << endl;
+
+            // Send on bus
+            i2c_set_slave_addr(0x51);
+
+            int16_t throttle = instruction.get_throttle();
+            int16_t steering = instruction.get_steering();
+            uint16_t buffer[] = {
+                STEERING_MANUAL_GAS, package_signed(throttle),
+                STEERING_MANUAL_ANG, package_signed(steering)
+            };
+            int len = 4;
+            i2c_write(buffer, len);
+        } else {
+            //cout << "No new instruction" << endl;
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+
+        if (connection.has_lost_connection()) {
+            cout << "Lost connection with user interface" << endl;
+            break;
+        }
+
+        //DriveData drivedata{1,2,3,4,5,6,7};
+        //string return_msg = drivedata.format_json();
+        //connection.write(return_msg);
+    }
     return 0;
 }

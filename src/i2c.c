@@ -15,6 +15,7 @@ void i2c_init() {
         printf("Failed to open the i2c bus\n");
         return;
     }
+    printf("I2C initiated\n");
 }
 
 void i2c_set_slave_addr(int slave_addr) {
@@ -23,6 +24,7 @@ void i2c_set_slave_addr(int slave_addr) {
         // ERROR HANDLING; you can check errno to see what went wrong
         return;
     }
+    printf("Set slave to %x\n", slave_addr);
 }
 
 void i2c_read(int16_t *buffer) {
