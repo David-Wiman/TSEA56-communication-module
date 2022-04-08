@@ -1,7 +1,7 @@
 #ifndef SEMIDRIVEINSTRUCTION_H
 #define SEMIDRIVEINSTRUCTION_H
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 class SemiDriveInstruction {
 public:

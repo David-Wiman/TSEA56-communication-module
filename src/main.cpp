@@ -1,6 +1,8 @@
 #include <iostream>
 #include <boost/asio.hpp>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
+#include <chrono>
+#include <thread>
 
 #include "i2c_common.h"
 #include "drivedata.h"
