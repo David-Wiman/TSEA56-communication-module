@@ -5,14 +5,15 @@
 
 class ManualDriveInstruction {
 public:
+    ManualDriveInstruction();
     ManualDriveInstruction(const nlohmann::json& j);
-    
-    float get_throttle();
-    float get_steering();
+
+    int get_throttle();
+    int get_steering();
 
 private:
-    float throttle;
-    float steering;
+    int throttle;
+    int steering;
 };
 
 #endif  // MANUALDRIVEINSTRUCTION_H

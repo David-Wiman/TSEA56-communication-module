@@ -2,50 +2,58 @@
 #include <boost/asio.hpp>
 #include <json.hpp>
 
+#include "i2c_common.h"
+#include "drivedata.h"
 #include "connection.h"
 #include "manualdriveinstruction.h"
 #include "drivedata.h"
 #include "log.h"
 
+extern "C" {
+    #include "i2c.h"
+}
+
 using namespace std;
 using json = nlohmann::json;
 
-bool exists(const json& j, const string& key) {
-    return j.find(key) != j.end();
-}
-
 int main() {
-    Logger log{"log.txt"}; //create a log
-    
+
+    cout << "Start" << endl;
+
+    // Initiate
+    i2c_init();
+    Logger logger{"log/log.txt"};
     Connection connection{1234};
-    
+
     while (true) {
-        string msg{};
-        try {
-            msg = connection.read();
-        } catch (boost::exception&) {
-            cout << "Lost connection" << endl;
+
+        if (connection.new_manual_instruction()) {
+            ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
+            
+            logger.log(INFO, "User interface", "Throttle", instruction.get_throttle());
+            logger.log(DEBUG, "User interface", "Steering", instruction.get_steering());
+
+            // Send on bus
+            i2c_set_slave_addr(0x51);
+
+            int16_t throttle = instruction.get_throttle();
+            int16_t steering = instruction.get_steering();
+            uint16_t buffer[] = {
+                STEERING_MANUAL_GAS, package_signed(throttle),
+                STEERING_MANUAL_ANG, package_signed(steering)
+            };
+            int len = 4;
+            i2c_write(buffer, len);
+        } else {
+            //cout << "No new instruction" << endl;
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+
+        if (connection.has_lost_connection()) {
+            cout << "Lost connection with user interface" << endl;
             break;
         }
-                
-        json j{};
-        try {
-            j = json::parse(msg);
-        } catch (std::invalid_argument&) {
-            cout << "Invalid argument" << endl;
-        }
-        
-        if (exists(j, "ManualDriveInstruction")) {
-            ManualDriveInstruction inst1(j);
-            cout << "Throttle: " << inst1.get_throttle() << endl;
-            cout << "Steering: " << inst1.get_steering() << endl;
-            
-            log.log(INFO, "User interface", "Throttle", inst1.get_throttle());
-            log.log(DEBUG, "User interface", "Steering", inst1.get_steering());
-        }
-            
-        
-        connection.write("Acknowledge");
     }
     
     return 0;
