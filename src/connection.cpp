@@ -12,12 +12,17 @@ bool exists(const json& j, const std::string& key) {
 
 /* Establish a connection on specified port, not done until a client respondes */
 Connection::Connection(int port)
-: port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)}, 
-  socket{io_service}, manual_instruction{false}, semi_instruction{false}, 
-  auto_instruction{false}, manual_drive_instruction{}, semi_drive_instruction{}, 
-  auto_drive_instruction{}, thread{} {
+: port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
+  socket{io_service}, manual_instruction{false}, semi_instruction{false},
+  auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
+  semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
     thread = new std::thread(&Connection::read, this);
+}
+
+Connection::~Connection() {
+    thread->join();
+    delete thread;
 }
 
 /* Reestablish connection, same operations as in constructor */
@@ -31,11 +36,12 @@ void Connection::restart() {
 /* Recieve a string from the client, set new_instruction, create instruction object */
 void Connection::read() {
     while (true) {
-        cout << "Read new" << endl;
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
+            cout << "Connection: Read until" << endl;
             boost::asio::read_until( socket, buf, "\n" );
+            cout << "Connection: Data recieved" << endl;
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
 
             json j{};
@@ -64,7 +70,8 @@ void Connection::read() {
                 auto_drive_instruction = inst;
             }
         } catch (const boost::exception&) {
-            throw LostConnectionError();
+            lost_connection.store(true);
+            break;
         }
     }
 }
@@ -73,6 +80,10 @@ void Connection::read() {
 void Connection::write(const std::string& response) {
     const std::string msg = response + "\n";
     boost::asio::write( socket, boost::asio::buffer(response));
+}
+
+bool Connection::has_lost_connection() {
+    return lost_connection.load();
 }
 
 /* Functions to check if a new value exists*/

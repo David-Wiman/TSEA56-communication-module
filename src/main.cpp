@@ -20,6 +20,15 @@ int main() {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
             cout << "Recieved throttle: " << instruction.get_throttle() << endl;
             cout << "Recieved steering: " << instruction.get_steering() << endl;
+        } else {
+            cout << "No new instruction" << endl;
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+
+        if (connection.has_lost_connection()) {
+            cout << "Lost connection with user interface" << endl;
+            break;
         }
 
         //DriveData drivedata{1,2,3,4,5,6,7};

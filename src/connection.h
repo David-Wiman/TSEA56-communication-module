@@ -12,20 +12,19 @@
 
 using json = nlohmann::json;
 
-/* Custom exception for connection loss */
-struct LostConnectionError : public std::exception {
-    const char * what () const throw () {
-        return "Lost connection with user interface";
-    }
-};
-
 class Connection {
 public:
     Connection(int port);
+    ~Connection();
+
+    /* Delete unused methods */
+    Connection(const Connection&) = delete;
+    Connection operator=(const Connection&) = delete;
 
     /* Basic function */
     void restart();
     void write(const std::string& response);
+    bool has_lost_connection();
 
     /* New-functions */
     bool new_manual_instruction();
@@ -50,6 +49,8 @@ private:
     std::atomic<bool> manual_instruction;
     std::atomic<bool> semi_instruction;
     std::atomic<bool> auto_instruction;
+
+    std::atomic<bool> lost_connection;
 
     /* Variables to return upon request */
     ManualDriveInstruction manual_drive_instruction;
