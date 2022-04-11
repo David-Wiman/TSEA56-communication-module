@@ -31,5 +31,5 @@ void Logger::log(int severity, std::string origin, std::string type, float value
 
 void Logger::log(int severity, std::string origin, std::string type, std::string value) {
 	time_t now = time(nullptr) ;
-	logstream << std::put_time(localtime(&now), "%T") << ", " << EnumStrings[severity] << ", " << origin << ", " << type << ": " << value << std::endl;
+	logstream << "[" << std::put_time(localtime(&now), "%T") << ", " << EnumStrings[severity] << "],\t" << origin << ",\t" << type << ":\t" << value << std::endl;
 }

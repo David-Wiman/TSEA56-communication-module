@@ -6,7 +6,7 @@
 #include <string>
 
 enum severity{INFO, DEBUG, WARNING, ERROR};
-static const char * EnumStrings[] = { "INFO", "DEBUG", "WARNING", "ERROR" };
+static const char * EnumStrings[] = { "INFO", "DEBUG", "WARN", "ERROR" };
 
 class Logger {
 public:
