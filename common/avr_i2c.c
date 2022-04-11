@@ -28,6 +28,8 @@ volatile int i2c_out_len = 0;
 volatile bool i2c_out_data_ready = false;
 volatile bool i2c_N_bytes_sent = false;
 
+volatile uint8_t debug = 0;
+
 void I2C_init(uint8_t slave_address) {
     TWAR = slave_address << 1;  // Set slave address
     // Start Slave Listening: Clear TWINT Flag, Enable ACK, Enable TWI, TWI Interrupt Enable
@@ -61,6 +63,8 @@ void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
 int I2C_unpack(uint16_t *message_names, uint16_t *messages) {
     // The arrays must be long enough for all possible message types
     // Use length 16 to be safe
+	
+	i2c_new_data = false;
 
     int msg_idx = 0;
 
@@ -84,6 +88,7 @@ ISR(TWI_vect) {
     cli();
     uint8_t status_code;
     status_code = TWSR & 0xf8;
+
     switch (status_code) {
 
         // Slave Receive Mode
@@ -133,7 +138,7 @@ ISR(TWI_vect) {
                 //i2c_N_bytes_sent = false;
             } else {
                 // This is unexpected
-                printf("ERROR\n");
+				debug |= 0x02;
             }
             break;
         case I2C_ST_WROTE_NACK:
@@ -146,15 +151,18 @@ ISR(TWI_vect) {
                 i2c_out_data_ready = false;
                 TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWIE);
             } else {
-                printf("ERROR\n");
+				debug |= 0x04;
             }
-            break;
-        case 0x40:
-            printf("WAT\n");
             break;
 
         default:
-            printf("Unrecognised status code\n");
+			// This should not happen, try to reset
+			debug |= 0x1;
+			i2c_out_data_ready = false;
+			i2c_N_bytes_sent = false;
+			TWCR |= (1<<TWINT);
+			TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
+			TWDR = 0x00;
             break;
     }
 

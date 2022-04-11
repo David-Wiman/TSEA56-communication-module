@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+/* Global bool which is set when new data is available. */
 volatile bool i2c_new_data;
 
 void I2C_init(uint8_t slave_address);
