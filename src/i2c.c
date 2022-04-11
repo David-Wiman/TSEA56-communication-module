@@ -2,6 +2,7 @@
 #include <fcntl.h>              // Needed for I2C port
 #include <sys/ioctl.h>          // Needed for I2C port
 #include <linux/i2c-dev.h>      // Needed for I2C port
+#include <stdbool.h>
 
 #include <stdio.h>
 #include <stdint.h>
@@ -36,25 +37,41 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
     if (code == 1) {
         len = buffer8[0];
         printf("Slave wants to transmit %d bytes\n", len);
-        if (len > 16)
+        if (len > 16) {
             printf("Warning: Slave wants to transmit too many bytes.\n");
+        } else if (len <= 0) {
+            printf("Error: Slave wants to transmit %d bytes\n", len);
+            return -1;
+        }
     } else {
         printf("Failed to get message length (code %d)\n", code);
         return -1;
     }
 
     code = read(file_i2c, buffer8, len);
+
+    printf("Recieved (raw):\n\t");
+    for (int i=0; i<len; i++)
+        printf("0x%x ", buffer8[i]);
+    printf("\n");
+
     if (code == -1) {
         // ERROR HANDLING: i2c transaction failed
         printf("Failed to read from the i2c bus.\n");
     } else if (code == len) {
         int j = 0;
+        bool got_label = false;
         for (int i=0; i<code; i+=2) {
             uint16_t message = (uint16_t)(buffer8[i]<<8) | buffer8[i+1];
             if ((message & 0xfff0) == 0xfff0) {
+                got_label = true;
                 message_names[j] = message;
-            } else {
+            } else if (got_label) {
+                got_label = false;
                 messages[j++] = message;
+            } else {
+                printf("Error unexpected data on i2c bus\n");
+                return -1;
             }
         }
         return j;
