@@ -19,10 +19,11 @@ Connection::Connection(int port)
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
     thread = new std::thread(&Connection::read, this);
-    cout << "Succesfully connected to port " << port << endl;
+    Logger.log(INFO, "connection.cpp", "Connection", "Connection established");
 }
 
 Connection::~Connection() {
+    Logger.log(INFO, "connection.cpp", "Connection", "Connection terminated");
     thread->join();
     delete thread;
 }
@@ -41,16 +42,21 @@ void Connection::read() {
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
-            cout << "Connection: Read until" << endl;
+            Logger.log(INFO, "connection.cpp", "read", "Reading untill new-line");
             boost::asio::read_until( socket, buf, "\n" );
-            cout << "Connection: Data recieved" << endl;
+            Logger.log(INFO, "connection.cpp", "read", "New-line recieved");
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
+
+            if (request == "STOP") {
+                // Stop the car
+                Logger.log(INFO, "connection.cpp", "read", "STOP recieved");
+            }
 
             json j{};
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                std::cout << "invalid argument" << std::endl;
+                Logger.log(INFO, "connection.cpp", "read", "Could not turn request into json object");
                 return;
             }
 
@@ -72,6 +78,7 @@ void Connection::read() {
                 auto_drive_instruction = inst;
             }
         } catch (const boost::exception&) {
+            Logger.log(INFO, "connection.cpp", "read", "Connection lost");
             lost_connection.store(true);
             break;
         }
@@ -101,10 +108,12 @@ bool Connection::new_auto_instruction() {
     return auto_instruction.load();
 }
 
-/* Gettersn, sets new-values to false*/
+/* Getters, sets new-values to false*/
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     manual_instruction.store(false);
+    Logger::log(INFO, "connection.cpp", "Throttle", manual_drive_instruction.get_throttle());
+    Logger::log(INFO, "connection.cpp", "Steering", manual_drive_instruction.get_steering());
     return manual_drive_instruction;
 }
 

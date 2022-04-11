@@ -29,9 +29,6 @@ int main() {
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-            
-            Logger::log(INFO, "User interface", "Throttle", instruction.get_throttle());
-            Logger::log(DEBUG, "User interface", "Steering", instruction.get_steering());
 
             // Send on bus
             i2c_set_slave_addr(0x51);
@@ -51,7 +48,6 @@ int main() {
         this_thread::sleep_for(chrono::milliseconds(100));
 
         if (connection.has_lost_connection()) {
-            cout << "Lost connection with user interface" << endl;
             break;
         }
     }
