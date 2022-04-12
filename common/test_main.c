@@ -18,6 +18,8 @@ int main(void){
     uint16_t in_data[16];
     uint16_t out_names[16];
     uint16_t out_data[16];
+	
+	I2C_pack_one(0xfff3, 0x8);
 
     while (true) {
         if (i2c_new_data) {
@@ -29,9 +31,9 @@ int main(void){
         }
 		
         out_names[0] = 0xfff0;
-        out_data[0] = 0; //0x4321;
+        out_data[0] = 0x4321;
         out_names[1] = 0xfff1;
-        out_data[1] = 0; //0x8765;
+        out_data[1] = 0x8765;
         I2C_pack(out_names, out_data, 2);
     }
 }

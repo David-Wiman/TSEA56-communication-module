@@ -12,6 +12,9 @@ void I2C_init(uint8_t slave_address);
  * be read. */
 void I2C_pack(uint16_t *message_names, uint16_t *messages, int len);
 
+/* Pack one data (and name) to send over i2c. */
+void I2C_pack_one(uint16_t message_name, uint16_t message);
+
 /* Unpack I2C from buffer.
  *
  * message_names and messages are arrays with length 16.

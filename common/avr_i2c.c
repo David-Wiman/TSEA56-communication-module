@@ -41,6 +41,13 @@ void I2C_init(uint8_t slave_address) {
     i2c_new_data = false;
 }
 
+void I2C_pack_one(uint16_t message_name, uint16_t message) {
+	cli();
+	uint16_t message_names[1] = {message_name};
+	int16_t messages[1] = {message};
+	I2C_pack(message_names, messages, 1);
+}
+
 void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
     cli();
 	if (!i2c_out_data_ready) {
@@ -48,15 +55,51 @@ void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
 		for (int i=0; i<len; ++i) {
 			uint8_t name0 = (uint8_t)((message_names[i] & 0xff00) >> 8);
 			uint8_t name1 = (uint8_t)(message_names[i] & 0x00ff);
-			uint8_t msg0 = (uint8_t)((messages[i] & 0xff00) >> 8);
-			uint8_t msg1 = (uint8_t)(messages[i] & 0x00ff);
+			uint8_t data0 = (uint8_t)((messages[i] & 0xff00) >> 8);
+			uint8_t data1 = (uint8_t)(messages[i] & 0x00ff);
 			i2c_out_buffer[4*i + 0] = name0;
 			i2c_out_buffer[4*i + 1] = name1;
-			i2c_out_buffer[4*i + 2] = msg0;
-			i2c_out_buffer[4*i + 3] = msg1;
+			i2c_out_buffer[4*i + 2] = data0;
+			i2c_out_buffer[4*i + 3] = data1;
 			i2c_out_len += 4;
 		}
 		i2c_out_data_ready = true;
+	} else {
+		// There is already some data in the buffer
+		// If the new data has same message_name, replace the data
+		// if the message_name doesn't exist add it
+		uint8_t temp_buffer[28];
+		int temp_buffer_ptr = 0;
+		for (int i=0; i<len; ++i) {
+			uint8_t new_name0 = (uint8_t)(message_names[i] >> 8);
+			uint8_t new_name1 = (uint8_t)(message_names[i] & 0x00ff);
+			uint8_t new_data0 = (uint8_t)(messages[i] >> 8);
+			uint8_t new_data1 = (uint8_t)(messages[i] & 0x00ff);
+			bool found = false;
+			for (int j=0; j<i2c_out_len; ++j) {
+				uint8_t buffer_name0 = i2c_out_buffer[4*j + 0];
+				uint8_t buffer_name1 = i2c_out_buffer[4*j + 1];
+				
+				if ((new_name0 == buffer_name0) && (new_name1 == buffer_name1)) {
+					found = true;
+					// Overwrite data
+					i2c_out_buffer[4*j + 2] = new_data0;
+					i2c_out_buffer[4*j + 3] = new_data1;
+					break;  // this name should only come once
+				}
+			}
+			if (!found) {
+				// Add to temporary buffer
+				temp_buffer[temp_buffer_ptr++] = new_name0;
+				temp_buffer[temp_buffer_ptr++] = new_name1;
+				temp_buffer[temp_buffer_ptr++] = new_data0;
+				temp_buffer[temp_buffer_ptr++] = new_data1;
+			}
+		}
+		// Write the new bytes to the buffer
+		for (int i=0; i<temp_buffer_ptr; ++i) {
+			i2c_out_buffer[i2c_out_len++] = temp_buffer[i];
+		}
 	}
     sei();
 }
