@@ -7,7 +7,7 @@ CC_CPP = g++
 CC_C = gcc
 
 # Other include directories with headers
-INC := -Icommon
+INC := -Icommon -Ilogger/src
 
 # Compiling flags
 CPPFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -Woverloaded-virtual -fmax-errors=3 -g
