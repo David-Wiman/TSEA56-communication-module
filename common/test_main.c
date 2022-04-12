@@ -7,8 +7,6 @@
 #include "avr_i2c.h"
 #include "i2c_common.h"
 
-//volatile uint8_t debug;
-
 int main(void){
 
     // Enable global interrupts

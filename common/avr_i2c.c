@@ -1,5 +1,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/sleep.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -115,7 +116,8 @@ ISR(TWI_vect) {
                     TWDR = i2c_out_len;
                     TWCR |= (1<<TWINT) | (1<<TWIE);
                 } else {
-                    TWDR = -2;
+					// Not ready, transmit 0 bytes
+                    TWDR = 0;
                     TWCR |= (1<<TWINT) | (1<<TWIE);
                 }
             } else {
@@ -135,7 +137,6 @@ ISR(TWI_vect) {
                 // Last byte
                 TWDR = i2c_out_buffer[i2c_out_ptr++];
                 TWCR |= (1<<TWINT) | (1<<TWIE);
-                //i2c_N_bytes_sent = false;
             } else {
                 // This is unexpected
 				debug |= 0x02;
@@ -160,10 +161,10 @@ ISR(TWI_vect) {
 			debug |= 0x1;
 			i2c_out_data_ready = false;
 			i2c_N_bytes_sent = false;
-			TWCR |= (1<<TWINT);
-			TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWEN) | (1<<TWIE);
+			
+			TWCR |= (1<<TWINT | (1<<TWSTO) | (1<<TWEN));
 			TWDR = 0x00;
-            break;
+			break;
     }
 
     sei();
