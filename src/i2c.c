@@ -39,8 +39,13 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
         printf("Slave wants to transmit %d bytes\n", len);
         if (len > 16) {
             printf("Warning: Slave wants to transmit too many bytes.\n");
-        } else if (len <= 0) {
-            printf("Error: Slave wants to transmit %d bytes\n", len);
+            printf("\t=0x%x bytes\n", len);
+            return -1;
+        } else if (len == 0) {
+            printf("Warning: Slave does not want to transmit data.\n");
+            return -1;
+        } else if (len < 0) {
+            printf("Errorlen < 0: Slave wants to transmit %d bytes\n", len);
             return -1;
         }
     } else {
