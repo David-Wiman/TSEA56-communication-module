@@ -18,12 +18,12 @@ Connection::Connection(int port)
   auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
+    Logger::log(INFO, "connection.cpp", "Connection", "Connection established");
     thread = new std::thread(&Connection::read, this);
-    Logger.log(INFO, "connection.cpp", "Connection", "Connection established");
 }
 
 Connection::~Connection() {
-    Logger.log(INFO, "connection.cpp", "Connection", "Connection terminated");
+    Logger::log(INFO, "connection.cpp", "Connection", "Connection terminated");
     thread->join();
     delete thread;
 }
@@ -42,21 +42,22 @@ void Connection::read() {
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
-            Logger.log(INFO, "connection.cpp", "read", "Reading untill new-line");
+            Logger::log(DEBUG, "connection.cpp", "read", "Reading untill new-line");
             boost::asio::read_until( socket, buf, "\n" );
-            Logger.log(INFO, "connection.cpp", "read", "New-line recieved");
+            Logger::log(DEBUG, "connection.cpp", "read", "New-line recieved");
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
+            Logger::log(DEBUG, "connection.cpp", "read", request);
 
-            if (request == "STOP") {
+            if (request == "STOP\n") {
                 // Stop the car
-                Logger.log(INFO, "connection.cpp", "read", "STOP recieved");
+                Logger::log(INFO, "connection.cpp", "read", "STOP recieved");
             }
 
             json j{};
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger.log(INFO, "connection.cpp", "read", "Could not turn request into json object");
+                Logger::log(WARNING, "connection.cpp", "read", "Could not turn request into json object");
                 return;
             }
 
@@ -78,7 +79,7 @@ void Connection::read() {
                 auto_drive_instruction = inst;
             }
         } catch (const boost::exception&) {
-            Logger.log(INFO, "connection.cpp", "read", "Connection lost");
+            Logger::log(ERROR, "connection.cpp", "read", "Connection lost");
             lost_connection.store(true);
             break;
         }

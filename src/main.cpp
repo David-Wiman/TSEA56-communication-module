@@ -18,8 +18,6 @@ using json = nlohmann::json;
 
 int main() {
 
-    cout << "Start" << endl;
-
     // Initiate
     Logger::init();
     i2c_init();
