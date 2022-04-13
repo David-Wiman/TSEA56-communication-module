@@ -2,9 +2,9 @@
 
 DriveData::DriveData(
       int time, float throttle, float steering, float driven_distance, 
-      int obsticle_distance, int lateral_position, float angle)
+      int obstacle_distance, int lateral_position, float angle)
 : time{time}, throttle{throttle}, steering{steering}, 
-  driven_distance{driven_distance}, obsticle_distance{obsticle_distance}, 
+  driven_distance{driven_distance}, obstacle_distance{obstacle_distance}, 
   lateral_position{lateral_position}, angle{angle} {}
 
 int DriveData::get_time() {
@@ -23,8 +23,8 @@ float DriveData::get_driven_distance() {
     return driven_distance;
 }
 
-int DriveData::get_obsticle_distance() {
-    return obsticle_distance;
+int DriveData::get_obstacle_distance() {
+    return obstacle_distance;
 }
 
 int DriveData::get_lateral_position() {
@@ -41,7 +41,7 @@ std::string DriveData::format_json() {
         << ", \"throttle\": " << throttle
         << ", \"steering\": " << steering
         << ", \"driven_distance\": " << driven_distance
-        << ", \"obsticle_distance\": " << obsticle_distance
+        << ", \"obstacle_distance\": " << obstacle_distance
         << ", \"lateral_position\": " << lateral_position
         << ", \"angle\": " << angle << "}}" ;
     std::string msg = oss.str();

@@ -5,6 +5,10 @@
 #include "drivedata.h"
 #include "log.h"
 #include "communication_module.h"
+extern "C" {
+    #include "i2c.h"
+    #include "i2c_common.h"
+}
 
 #include <iostream>
 #include <chrono>
@@ -22,7 +26,13 @@ int main() {
     i2c_init();
     Connection connection{1234};
 
+    sensor_data_t sensor_data{};
+
     while (true) {
+
+        if (CommunicationModule::get_sensor_data(sensor_data)) {
+            // Error
+        }
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();

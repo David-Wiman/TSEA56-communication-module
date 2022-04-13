@@ -15,6 +15,9 @@ inline int16_t restore_signed(uint16_t num) {
     return (int16_t)(((num & 0x4000) << 1) | num);
 }
 
+#define STEERING_MODULE_SLAVE_ADDRESS 0x51
+#define SENSOR_MODULE_SLAVE_ADDRESS   0x52
+
 #define STEERING_MANUAL_GAS       0xfff0
 #define STEERING_MANUAL_ANG       0xfff1
 #define STEERING_CUR_VEL          0xfff2
