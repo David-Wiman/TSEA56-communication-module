@@ -41,6 +41,14 @@ void I2C_init(uint8_t slave_address) {
     i2c_new_data = false;
 }
 
+void I2C_reset() {
+	i2c_out_data_ready = false;
+	i2c_N_bytes_sent = false;
+		
+	TWDR = 0x00;		
+	TWCR |= (1<<TWINT |1<<TWSTO);
+}
+
 void I2C_pack_one(uint16_t message_name, uint16_t message) {
 	cli();
 	uint16_t message_names[1] = {message_name};
@@ -180,8 +188,9 @@ ISR(TWI_vect) {
                 TWDR = i2c_out_buffer[i2c_out_ptr++];
                 TWCR |= (1<<TWINT) | (1<<TWIE);
             } else {
-                // This is unexpected
+                // This is unexpected, try to reset
 				debug |= 0x02;
+				I2C_reset();
             }
             break;
         case I2C_ST_WROTE_NACK:
@@ -194,18 +203,16 @@ ISR(TWI_vect) {
                 i2c_out_data_ready = false;
                 TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWIE);
             } else {
+				// This is unexpected, try to reset
 				debug |= 0x04;
+				I2C_reset();
             }
             break;
 
         default:
 			// This should not happen, try to reset
 			debug |= 0x1;
-			i2c_out_data_ready = false;
-			i2c_N_bytes_sent = false;
-			
-			TWCR |= (1<<TWINT | (1<<TWSTO) | (1<<TWEN));
-			TWDR = 0x00;
+			I2C_reset();
 			break;
     }
 
