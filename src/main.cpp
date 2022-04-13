@@ -2,6 +2,8 @@
 #include "drivedata.h"
 #include "connection.h"
 #include "manualdriveinstruction.h"
+#include "drivedata.h"
+#include "log.h"
 
 #include <iostream>
 #include <chrono>
@@ -17,9 +19,9 @@ using namespace std;
 using json = nlohmann::json;
 
 int main() {
-    cout << "Start" << endl;
 
     // Initiate
+    Logger::init();
     i2c_init();
     Connection connection{1234};
 
@@ -27,8 +29,6 @@ int main() {
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-            cout << "Recieved throttle: " << instruction.get_throttle() << endl;
-            cout << "Recieved steering: " << instruction.get_steering() << endl;
 
             // Send on bus
             i2c_set_slave_addr(0x51);
@@ -48,9 +48,11 @@ int main() {
         this_thread::sleep_for(chrono::milliseconds(100));
 
         if (connection.has_lost_connection()) {
-            cout << "Lost connection with user interface" << endl;
             break;
         }
     }
+    
     return 0;
 }
+    
+   
