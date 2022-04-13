@@ -44,7 +44,7 @@ void I2C_init(uint8_t slave_address) {
 void I2C_pack_one(uint16_t message_name, uint16_t message) {
 	cli();
 	uint16_t message_names[1] = {message_name};
-	int16_t messages[1] = {message};
+	uint16_t messages[1] = {message};
 	I2C_pack(message_names, messages, 1);
 }
 
@@ -115,7 +115,6 @@ int I2C_unpack(uint16_t *message_names, uint16_t *messages) {
     // Translate the 8 bit packages to 16 bit data, and put them in the place for
     for (int i=0; i<i2c_in_ptr/2; i++) {
         uint16_t packet = (uint16_t)(i2c_in_buffer[2*i] << 8) | i2c_in_buffer[2*i+1];
-        printf(packet);
         if ((packet & 0xfff0) == 0xfff0) {
             // Message name
             message_names[msg_idx] = packet;
