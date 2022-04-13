@@ -4,16 +4,13 @@
 #include "manualdriveinstruction.h"
 #include "drivedata.h"
 #include "log.h"
+#include "communication_module.h"
 
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
-
-extern "C" {
-    #include "i2c.h"
-}
 
 using namespace std;
 using json = nlohmann::json;
@@ -29,18 +26,9 @@ int main() {
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-
-            // Send on bus
-            i2c_set_slave_addr(0x51);
-
             int16_t throttle = instruction.get_throttle();
             int16_t steering = instruction.get_steering();
-            uint16_t buffer[] = {
-                STEERING_MANUAL_GAS, package_signed(throttle),
-                STEERING_MANUAL_ANG, package_signed(steering)
-            };
-            int len = 4;
-            i2c_write(buffer, len);
+            CommunicationModule::send_manual_instruction(throttle, steering);
         } else {
             //cout << "No new instruction" << endl;
         }
