@@ -16,7 +16,10 @@ CPPFLAGS += -std=c++17 -MMD $(INC)
 CFLAGS := -Wall -Wextra -pedantic
 CFLAGS += $(INC)
 
+CFLAGS := -Wall -Wextra -pedantic
+
 # Linking flags
+LDFLAGS += -lboost_system -lpthread
 
 # File which contains the main function
 MAINFILE := main.cpp

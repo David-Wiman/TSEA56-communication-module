@@ -1,46 +1,56 @@
 #include "i2c_common.h"
+#include "drivedata.h"
+#include "connection.h"
+#include "manualdriveinstruction.h"
 
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <boost/asio.hpp>
+#include <nlohmann/json.hpp>
 
 extern "C" {
     #include "i2c.h"
 }
 
 using namespace std;
+using json = nlohmann::json;
 
 int main() {
-    cout << "MAIN!" << endl;
-    i2c_init();
-    i2c_set_slave_addr(0x50);
+    cout << "Start" << endl;
 
-    int tests{1000};
-    int sucessfull_tests{0};
-    int delay_ms = 10;
-    int max_consecutive_fails{0};
-    int consecutive_fails{0};
-    for (int n=0; n<tests; ++n) {
-        uint16_t message_names[16];
-        uint16_t messages[16];
-        int len = i2c_read(message_names, messages);
-        if (len > 0) {
-            printf("Read %d packages:\n", len);
-            for (int i=0; i<len; ++i)
-                printf("\tName: 0x%x Data 0x%x\n", message_names[i], messages[i]);
-            sucessfull_tests++;
-            consecutive_fails = 0;
-	} else if (len == 0) {
-		cout << "Warning: Slave has no new data." << endl;
+    // Initiate
+    i2c_init();
+    Connection connection{1234};
+
+    while (true) {
+
+        if (connection.new_manual_instruction()) {
+            ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
+            cout << "Recieved throttle: " << instruction.get_throttle() << endl;
+            cout << "Recieved steering: " << instruction.get_steering() << endl;
+
+            // Send on bus
+            i2c_set_slave_addr(0x51);
+
+            int16_t throttle = instruction.get_throttle();
+            int16_t steering = instruction.get_steering();
+            uint16_t buffer[] = {
+                STEERING_MANUAL_GAS, package_signed(throttle),
+                STEERING_MANUAL_ANG, package_signed(steering)
+            };
+            int len = 4;
+            i2c_write(buffer, len);
         } else {
-            max_consecutive_fails = max(max_consecutive_fails, ++consecutive_fails);
-	    cout << "I2C Error: " << len << endl;
+            //cout << "No new instruction" << endl;
         }
-        this_thread::sleep_for(chrono::milliseconds(delay_ms));
+
+        this_thread::sleep_for(chrono::milliseconds(100));
+
+        if (connection.has_lost_connection()) {
+            cout << "Lost connection with user interface" << endl;
+            break;
+        }
     }
-    i2c_close();
-    cout << "\n" << sucessfull_tests << "/" << tests
-         << " successful reads (@" << 1/(delay_ms/1000.0) << " Hz)"
-         << " (at most " << max_consecutive_fails << " fails in a row)" << endl;
     return 0;
 }
