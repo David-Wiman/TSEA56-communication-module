@@ -30,9 +30,11 @@ int main() {
                 printf("\tName: 0x%x Data 0x%x\n", message_names[i], messages[i]);
             sucessfull_tests++;
             consecutive_fails = 0;
+	} else if (len == 0) {
+		cout << "Warning: Slave has no new data." << endl;
         } else {
             max_consecutive_fails = max(max_consecutive_fails, ++consecutive_fails);
-            printf("\tError\n");
+	    cout << "I2C Error: " << len << endl;
         }
         this_thread::sleep_for(chrono::milliseconds(delay_ms));
     }
