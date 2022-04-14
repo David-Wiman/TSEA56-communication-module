@@ -13,30 +13,26 @@ typedef struct sensor_data_type {
     int speed = 0;
 } sensor_data_t;
 
+typedef struct camera_data_type {
+    int lateral_position = 0;
+    int angle = 0;
+} camera_data_t;
+
 class DriveData {
 public:
-    DriveData(int time, float throttle, float steering, float driven_distance,
-              int obstacle_distance, int lateral_position, float angle);
-
-    int get_time();
-    float get_throttle();
-    float get_steering();
-    float get_driven_distance();
-    int get_obstacle_distance();
-    int get_lateral_position();
-    float get_angle();
-    void update_sensor_data(sensor_data_t const &sensor_data);
+    DriveData(int elasped_time, float throttle, float steering, sensor_data_t sensor_data, camera_data_t camera_data);
 
     std::string format_json();
 
 private:
-    int time;
+    int elasped_time;
     float throttle;
     float steering;
-    float driven_distance;
     int obstacle_distance;
+    int driving_distance;
+    int speed;
     int lateral_position;
-    float angle;
+    int angle;
 };
 
 #endif  // DRIVEDATA_H

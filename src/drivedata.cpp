@@ -1,47 +1,20 @@
 #include "drivedata.h"
 
-DriveData::DriveData(
-      int time, float throttle, float steering, float driven_distance, 
-      int obstacle_distance, int lateral_position, float angle)
-: time{time}, throttle{throttle}, steering{steering}, 
-  driven_distance{driven_distance}, obstacle_distance{obstacle_distance}, 
-  lateral_position{lateral_position}, angle{angle} {}
-
-int DriveData::get_time() {
-    return time;
-}
-
-float DriveData::get_throttle() {
-    return throttle;
-}
-
-float DriveData::get_steering() {
-    return steering;
-}
-
-float DriveData::get_driven_distance() {
-    return driven_distance;
-}
-
-int DriveData::get_obstacle_distance() {
-    return obstacle_distance;
-}
-
-int DriveData::get_lateral_position() {
-    return lateral_position;
-}
-
-float DriveData::get_angle() {
-    return angle;
-}
+DriveData::DriveData(int elasped_time, float throttle, float steering,
+                    sensor_data_t sensor_data, camera_data_t camera_data)
+: elasped_time{elasped_time}, throttle{throttle}, steering{steering}, 
+  obstacle_distance{sensor_data.obstacle_distance},
+  driving_distance{sensor_data.driving_distance}, speed{sensor_data.speed},
+  lateral_position{camera_data.lateral_position}, angle{camera_data.angle} {}
 
 std::string DriveData::format_json() {
     std::ostringstream oss;
-    oss << "{\"DriveData\": {\"time\": " << time
+    oss << "{\"DriveData\": {\"time\": " << elasped_time
         << ", \"throttle\": " << throttle
         << ", \"steering\": " << steering
-        << ", \"driven_distance\": " << driven_distance
         << ", \"obstacle_distance\": " << obstacle_distance
+        << ", \"driving_distance\": " << driving_distance
+        << ", \"speed\": " << speed
         << ", \"lateral_position\": " << lateral_position
         << ", \"angle\": " << angle << "}}" ;
     std::string msg = oss.str();

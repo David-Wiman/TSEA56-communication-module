@@ -27,6 +27,7 @@ int main() {
     Connection connection{1234};
 
     sensor_data_t sensor_data{};
+    camera_data_t camera_data{};
 
     while (true) {
 
