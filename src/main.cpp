@@ -44,6 +44,12 @@ int main() {
             int16_t throttle = instruction.get_throttle();
             int16_t steering = instruction.get_steering();
             CommunicationModule::send_manual_instruction(throttle, steering);
+        } else if (connection.new_semi_instruction()) {
+            SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
+            cout << "Recived direction: " << instruction.get_direction() << endl;
+            cout << "Recieved id: " << instruction.get_id() << endl; 
+
+            // Process instruction here
         } else {
             //cout << "No new instruction" << endl;
         }

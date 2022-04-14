@@ -51,12 +51,8 @@ void Connection::read() {
             Logger::log(DEBUG, "connection.cpp", "read", request);
 
             if (request == "STOP\n") {
-                // Stop the car
-                Logger::log(INFO, "connection.cpp", "read", "STOP recieved");
-            }
-
-            if (request == "STOP\n") {
                 // Emergency stop recieved, kill car
+                Logger::log(INFO, "connection.cpp", "read", "STOP recieved");
                 emergency_stop.store(true);
                 return;
             }
