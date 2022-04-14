@@ -76,7 +76,10 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
         int j = 0;
         bool got_label = false;
         for (int i=0; i<code; i+=2) {
-            uint16_t message = (uint16_t)(buffer8[i]<<8) | buffer8[i+1];
+            uint8_t msg0 = buffer8[i];
+            uint8_t msg1 = buffer8[i+1];
+            // the bus sometimes flips msb so we don't use that bit
+            uint16_t message = (uint16_t)(buffer8[i] << 7) | (buffer8[i+1] & 0x7f);
             if ((message & 0xfff0) == 0xfff0) {
                 got_label = true;
                 message_names[j] = message;

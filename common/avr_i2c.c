@@ -65,6 +65,11 @@ void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
             uint8_t name1 = (uint8_t)(message_names[i] & 0x00ff);
             uint8_t data0 = (uint8_t)((messages[i] & 0xff00) >> 8);
             uint8_t data1 = (uint8_t)(messages[i] & 0x00ff);
+
+            // The bus sometimes flips msb. Let's not use that bit
+            data0 = (data0 << 1) | (data1 & 0x80);
+            data1 &= 0x7f;
+
             i2c_out_buffer[4*i + 0] = name0;
             i2c_out_buffer[4*i + 1] = name1;
             i2c_out_buffer[4*i + 2] = data0;
