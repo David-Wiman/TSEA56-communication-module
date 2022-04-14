@@ -42,81 +42,81 @@ void I2C_init(uint8_t slave_address) {
 }
 
 void I2C_reset() {
-	i2c_out_data_ready = false;
-	i2c_N_bytes_sent = false;
-		
-	TWDR = 0x00;		
-	TWCR |= (1<<TWINT |1<<TWSTO);
+    i2c_out_data_ready = false;
+    i2c_N_bytes_sent = false;
+
+    TWDR = 0x00;
+    TWCR |= (1<<TWINT |1<<TWSTO);
 }
 
 void I2C_pack_one(uint16_t message_name, uint16_t message) {
-	cli();
-	uint16_t message_names[1] = {message_name};
-	uint16_t messages[1] = {message};
-	I2C_pack(message_names, messages, 1);
+    cli();
+    uint16_t message_names[1] = {message_name};
+    uint16_t messages[1] = {message};
+    I2C_pack(message_names, messages, 1);
 }
 
 void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
     cli();
-	if (!i2c_out_data_ready) {
-		i2c_out_len = 0;
-		for (int i=0; i<len; ++i) {
-			uint8_t name0 = (uint8_t)((message_names[i] & 0xff00) >> 8);
-			uint8_t name1 = (uint8_t)(message_names[i] & 0x00ff);
-			uint8_t data0 = (uint8_t)((messages[i] & 0xff00) >> 8);
-			uint8_t data1 = (uint8_t)(messages[i] & 0x00ff);
-			i2c_out_buffer[4*i + 0] = name0;
-			i2c_out_buffer[4*i + 1] = name1;
-			i2c_out_buffer[4*i + 2] = data0;
-			i2c_out_buffer[4*i + 3] = data1;
-			i2c_out_len += 4;
-		}
-		i2c_out_data_ready = true;
-	} else {
-		// There is already some data in the buffer
-		// If the new data has same message_name, replace the data
-		// if the message_name doesn't exist add it
-		uint8_t temp_buffer[28];
-		int temp_buffer_ptr = 0;
-		for (int i=0; i<len; ++i) {
-			uint8_t new_name0 = (uint8_t)(message_names[i] >> 8);
-			uint8_t new_name1 = (uint8_t)(message_names[i] & 0x00ff);
-			uint8_t new_data0 = (uint8_t)(messages[i] >> 8);
-			uint8_t new_data1 = (uint8_t)(messages[i] & 0x00ff);
-			bool found = false;
-			for (int j=0; j<i2c_out_len; ++j) {
-				uint8_t buffer_name0 = i2c_out_buffer[4*j + 0];
-				uint8_t buffer_name1 = i2c_out_buffer[4*j + 1];
-				
-				if ((new_name0 == buffer_name0) && (new_name1 == buffer_name1)) {
-					found = true;
-					// Overwrite data
-					i2c_out_buffer[4*j + 2] = new_data0;
-					i2c_out_buffer[4*j + 3] = new_data1;
-					break;  // this name should only come once
-				}
-			}
-			if (!found) {
-				// Add to temporary buffer
-				temp_buffer[temp_buffer_ptr++] = new_name0;
-				temp_buffer[temp_buffer_ptr++] = new_name1;
-				temp_buffer[temp_buffer_ptr++] = new_data0;
-				temp_buffer[temp_buffer_ptr++] = new_data1;
-			}
-		}
-		// Write the new bytes to the buffer
-		for (int i=0; i<temp_buffer_ptr; ++i) {
-			i2c_out_buffer[i2c_out_len++] = temp_buffer[i];
-		}
-	}
+    if (!i2c_out_data_ready) {
+        i2c_out_len = 0;
+        for (int i=0; i<len; ++i) {
+            uint8_t name0 = (uint8_t)((message_names[i] & 0xff00) >> 8);
+            uint8_t name1 = (uint8_t)(message_names[i] & 0x00ff);
+            uint8_t data0 = (uint8_t)((messages[i] & 0xff00) >> 8);
+            uint8_t data1 = (uint8_t)(messages[i] & 0x00ff);
+            i2c_out_buffer[4*i + 0] = name0;
+            i2c_out_buffer[4*i + 1] = name1;
+            i2c_out_buffer[4*i + 2] = data0;
+            i2c_out_buffer[4*i + 3] = data1;
+            i2c_out_len += 4;
+        }
+        i2c_out_data_ready = true;
+    } else {
+        // There is already some data in the buffer
+        // If the new data has same message_name, replace the data
+        // if the message_name doesn't exist add it
+        uint8_t temp_buffer[28];
+        int temp_buffer_ptr = 0;
+        for (int i=0; i<len; ++i) {
+            uint8_t new_name0 = (uint8_t)(message_names[i] >> 8);
+            uint8_t new_name1 = (uint8_t)(message_names[i] & 0x00ff);
+            uint8_t new_data0 = (uint8_t)(messages[i] >> 8);
+            uint8_t new_data1 = (uint8_t)(messages[i] & 0x00ff);
+            bool found = false;
+            for (int j=0; j<i2c_out_len; ++j) {
+                uint8_t buffer_name0 = i2c_out_buffer[4*j + 0];
+                uint8_t buffer_name1 = i2c_out_buffer[4*j + 1];
+
+                if ((new_name0 == buffer_name0) && (new_name1 == buffer_name1)) {
+                    found = true;
+                    // Overwrite data
+                    i2c_out_buffer[4*j + 2] = new_data0;
+                    i2c_out_buffer[4*j + 3] = new_data1;
+                    break;  // this name should only come once
+                }
+            }
+            if (!found) {
+                // Add to temporary buffer
+                temp_buffer[temp_buffer_ptr++] = new_name0;
+                temp_buffer[temp_buffer_ptr++] = new_name1;
+                temp_buffer[temp_buffer_ptr++] = new_data0;
+                temp_buffer[temp_buffer_ptr++] = new_data1;
+            }
+        }
+        // Write the new bytes to the buffer
+        for (int i=0; i<temp_buffer_ptr; ++i) {
+            i2c_out_buffer[i2c_out_len++] = temp_buffer[i];
+        }
+    }
     sei();
 }
 
 int I2C_unpack(uint16_t *message_names, uint16_t *messages) {
     // The arrays must be long enough for all possible message types
     // Use length 16 to be safe
-	
-	i2c_new_data = false;
+
+    i2c_new_data = false;
 
     int msg_idx = 0;
 
@@ -166,7 +166,7 @@ ISR(TWI_vect) {
                     TWDR = i2c_out_len;
                     TWCR |= (1<<TWINT) | (1<<TWIE);
                 } else {
-					// Not ready, transmit 0 bytes
+                    // Not ready, transmit 0 bytes
                     TWDR = 0;
                     TWCR |= (1<<TWINT) | (1<<TWIE);
                 }
@@ -189,8 +189,8 @@ ISR(TWI_vect) {
                 TWCR |= (1<<TWINT) | (1<<TWIE);
             } else {
                 // This is unexpected, try to reset
-				debug |= 0x02;
-				I2C_reset();
+                debug |= 0x02;
+                I2C_reset();
             }
             break;
         case I2C_ST_WROTE_NACK:
@@ -199,21 +199,21 @@ ISR(TWI_vect) {
                 i2c_N_bytes_sent = true;
                 TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWIE);
             } else if (i2c_out_ptr == i2c_out_len) {
-				i2c_N_bytes_sent = false;
+                i2c_N_bytes_sent = false;
                 i2c_out_data_ready = false;
                 TWCR |= (1<<TWINT) | (1<<TWEA) | (1<<TWIE);
             } else {
-				// This is unexpected, try to reset
-				debug |= 0x04;
-				I2C_reset();
+                // This is unexpected, try to reset
+                debug |= 0x04;
+                I2C_reset();
             }
             break;
 
         default:
-			// This should not happen, try to reset
-			debug |= 0x1;
-			I2C_reset();
-			break;
+            // This should not happen, try to reset
+            debug |= 0x1;
+            I2C_reset();
+            break;
     }
 
     sei();

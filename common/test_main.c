@@ -13,26 +13,26 @@ int main(void){
     sei();
 
     I2C_init(0x50);
-	
-	volatile uint16_t x = 0;
-	volatile uint16_t y = 0;
+
+    volatile uint16_t x = 0;
+    volatile uint16_t y = 0;
 
     uint16_t in_names[16];
     uint16_t in_data[16];
     uint16_t out_names[16];
     uint16_t out_data[16];
-    
+
     I2C_pack_one(0xfff3, 0x8);
 
     while (true) {
-		x++;
-		if (x % 1000) {
-			y++;
-		}
-		if (y % 10000) {
-			I2C_pack_one(0xfffa, y);
-		}
-		I2C_pack_one(0xfffb, 0x7777);
+        x++;
+        if (x % 1000) {
+            y++;
+        }
+        if (y % 10000) {
+            I2C_pack_one(0xfffa, y);
+        }
+        I2C_pack_one(0xfffb, 0x7777);
 
         //if (i2c_new_data) {
             //int len = I2C_unpack(in_names, in_data);
@@ -41,7 +41,7 @@ int main(void){
                 //printf(in_names[i], val);
             //}
         //}
-		
+
         //out_names[0] = 0xfff0;
         //out_data[0] = 0x4321;
         //out_names[1] = 0xfff1;

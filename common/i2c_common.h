@@ -33,10 +33,10 @@ inline int16_t restore_signed(uint16_t num) {
 #define STEERING_TURN_KD          0xfffC
 #define STEERING_REGULATION_MODE  0xfffD
 
-#define SENSOR_OBSTACLE_DISTANCE	  0xfff0
+#define SENSOR_OBSTACLE_DISTANCE      0xfff0
 #define SENSOR_LEFT_DRIVING_DISTANCE  0xfff1
 #define SENSOR_RIGHT_DRIVING_DISTANCE 0xfff2
-#define SENSOR_LEFT_SPEED			  0xfff3
-#define SENSOR_RIGHT_SPEED			  0xfff4
+#define SENSOR_LEFT_SPEED             0xfff3
+#define SENSOR_RIGHT_SPEED            0xfff4
 
 #endif  // COMMON_H
