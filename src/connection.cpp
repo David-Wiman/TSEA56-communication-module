@@ -16,7 +16,7 @@ bool exists(const json& j, const std::string& key) {
 /* Establish a connection on specified port, not done until a client respondes */
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
-  socket{io_service}, manual_instruction{false}, semi_instruction{false},
+  socket{io_service}, emergency_stop{false}, manual_instruction{false}, semi_instruction{false},
   auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
@@ -53,6 +53,12 @@ void Connection::read() {
             if (request == "STOP\n") {
                 // Stop the car
                 Logger::log(INFO, "connection.cpp", "read", "STOP recieved");
+            }
+
+            if (request == "STOP\n") {
+                // Emergency stop recieved, kill car
+                emergency_stop.store(true);
+                return;
             }
 
             json j{};
@@ -96,6 +102,11 @@ void Connection::write(const std::string& response) {
 
 bool Connection::has_lost_connection() {
     return lost_connection.load();
+}
+
+/* Returns true if user pressed emergency stop */
+bool Connection::emergency_recieved() {
+    return emergency_stop.load();
 }
 
 /* Functions to check if a new value exists*/

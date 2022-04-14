@@ -26,6 +26,9 @@ public:
     void write(const std::string& response);
     bool has_lost_connection();
 
+    /* Emergency stop */
+    bool emergency_recieved();
+
     /* New-functions */
     bool new_manual_instruction();
     bool new_semi_instruction();
@@ -46,6 +49,7 @@ private:
     boost::asio::ip::tcp::socket socket;
 
     /* Variables to check if a new instructions has come */
+    std::atomic<bool> emergency_stop;
     std::atomic<bool> manual_instruction;
     std::atomic<bool> semi_instruction;
     std::atomic<bool> auto_instruction;

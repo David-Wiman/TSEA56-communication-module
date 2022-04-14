@@ -30,6 +30,10 @@ int main() {
     camera_data_t camera_data{};
 
     while (true) {
+        if (connection.emergency_recieved()) {
+            cout << "Emergency stop recieved!" << endl;
+            break; // Kill car
+        }
 
         if (CommunicationModule::get_sensor_data(sensor_data)) {
             // Error
