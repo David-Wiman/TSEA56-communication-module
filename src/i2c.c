@@ -82,10 +82,6 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
                 message_names[j] = message;
             } else if (got_label) {
                 got_label = false;
-                // Bus sometimes flips msb, so we avoid using it
-                i2c_log("O message=0x%x\n", message);
-                message = ((message & 0x7f00) >> 1) | (message & 0x007f);
-                i2c_log("M message=0x%x\n", message);
                 messages[j++] = message;
             } else {
                 i2c_log("Error unexpected data on i2c bus\n");
