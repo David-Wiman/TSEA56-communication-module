@@ -22,6 +22,10 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
     int len = i2c_read(message_names, messages);
     if (len > 0) {
         cout << "Read " << len << " packages" << endl;
+        uint16_t left_driving_distance{0};
+        uint16_t right_driving_distance{0};
+        uint16_t left_speed{0};
+        uint16_t right_speed{0};
         for (int i=0; i<len; ++i) {
             switch (message_names[i]) {
                 case SENSOR_OBSTACLE_DISTANCE:
@@ -29,15 +33,25 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
                     cout << "Read obstacle distance: "
                          << sensor_data.obstacle_distance << endl;
                     break;
-                case SENSOR_DRIVING_DISTANCE:
-                    sensor_data.driving_distance = messages[i];
-                    cout << "Read driving distance: "
-                         << sensor_data.driving_distance << endl;
+                case SENSOR_LEFT_DRIVING_DISTANCE:
+                    left_driving_distance = messages[i];
+                    cout << "Read left driving distance: "
+                         << messages[i] << endl;
                     break;
-                case SENSOR_SPEED:
-                    sensor_data.speed = messages[i];
-                    cout << "Read speed: "
-                         << sensor_data.speed << endl;
+                case SENSOR_RIGHT_DRIVING_DISTANCE:
+                    right_driving_distance = messages[i];
+                    cout << "Read right driving distance: "
+                         << messages[i] << endl;
+                    break;
+                case SENSOR_LEFT_SPEED:
+                    left_speed = messages[i];
+                    cout << "Read left speed: "
+                         << messages[i] << endl;
+                    break;
+                case SENSOR_RIGHT_SPEED:
+                    right_speed = messages[i];
+                    cout << "Read right speed: "
+                         << messages[i] << endl;
                     break;
                 default:
                     cout << "Warning: Unexpected value read from sensor module "
@@ -45,6 +59,28 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
                     break;
             }
         }
+
+        // Calculate means
+        if (left_driving_distance && right_driving_distance) {
+            sensor_data.driving_distance = (left_driving_distance + right_driving_distance) / 2;
+        } else if (left_driving_distance) {
+            sensor_data.driving_distance = left_driving_distance;
+        } else if (right_driving_distance) {
+            sensor_data.driving_distance = right_driving_distance;
+        } else {
+            cout << "Warning: No driving distance recieved" << endl;
+        }
+        if (left_speed && right_speed) {
+            sensor_data.speed = (left_speed + right_speed) / 2;
+        } else if (left_speed) {
+            sensor_data.speed = left_speed;
+        } else if (right_speed) {
+            sensor_data.speed = right_speed;
+        } else {
+            cout << "Warning: No speed recieved" << endl;
+        }
+
+        // TODO should this be 1 if missing some data?
         return 0;
     } else if (len == 0) {
         cout << "Warning: Slave has no new data." << endl;
