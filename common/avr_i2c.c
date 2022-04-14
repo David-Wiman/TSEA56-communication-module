@@ -66,9 +66,9 @@ void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
             uint8_t data0 = (uint8_t)((messages[i] & 0xff00) >> 8);
             uint8_t data1 = (uint8_t)(messages[i] & 0x00ff);
 
-            // The bus sometimes flips msb. Let's not use that bit
-            data0 = (data0 << 1) | (data1 & 0x80);
-            data1 &= 0x7f;
+			// The bus sometimes flips msb. Let's not use that bit
+			data0 = ((data0 & 0x3f) << 1) | ((data1 & 0x80) >> 7);
+			data1 = data1 & 0x7f;
 
             i2c_out_buffer[4*i + 0] = name0;
             i2c_out_buffer[4*i + 1] = name1;
@@ -88,6 +88,11 @@ void I2C_pack(uint16_t *message_names, uint16_t *messages, int len) {
             uint8_t new_name1 = (uint8_t)(message_names[i] & 0x00ff);
             uint8_t new_data0 = (uint8_t)(messages[i] >> 8);
             uint8_t new_data1 = (uint8_t)(messages[i] & 0x00ff);
+			
+			// The bus sometimes flips msb. Let's not use that bit
+			new_data0 = ((new_data0 & 0x3f) << 1) | ((new_data1 & 0x80) >> 7);
+			new_data1 = new_data1 & 0x7f;
+			
             bool found = false;
             for (int j=0; j<i2c_out_len; ++j) {
                 uint8_t buffer_name0 = i2c_out_buffer[4*j + 0];

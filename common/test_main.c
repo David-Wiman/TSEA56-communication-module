@@ -25,14 +25,14 @@ int main(void){
     I2C_pack_one(0xfff3, 0x8);
 
     while (true) {
-        x++;
-        if (x % 1000) {
-            y++;
-        }
-        if (y % 10000) {
-            I2C_pack_one(0xfffa, y);
-        }
-        I2C_pack_one(0xfffb, 0x7777);
+		x++;
+		if (x % 1000) {
+			y++;
+		}
+		if (y % 10000) {
+			//I2C_pack_one(0xfffa, 0x0000);
+		}
+		I2C_pack_one(0xfffb, 0x3fff);
 
         //if (i2c_new_data) {
             //int len = I2C_unpack(in_names, in_data);
