@@ -4,6 +4,8 @@ extern "C" {
     #include "i2c_common.h"
 }
 
+#include <iostream>
+
 using namespace std;
 
 void CommunicationModule::send_manual_instruction(uint16_t throttle, uint16_t steering) {
