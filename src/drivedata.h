@@ -20,14 +20,15 @@ typedef struct camera_data_type {
 
 class DriveData {
 public:
-    DriveData(int elasped_time, float throttle, float steering, sensor_data_t sensor_data, camera_data_t camera_data);
+    DriveData(int elasped_time, int throttle, int steering,
+              sensor_data_t sensor_data, camera_data_t camera_data);
 
     std::string format_json();
 
 private:
-    int elasped_time;
-    float throttle;
-    float steering;
+    int elapsed_time;
+    int throttle;
+    int steering;
     int obstacle_distance;
     int driving_distance;
     int speed;
