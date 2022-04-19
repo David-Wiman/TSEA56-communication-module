@@ -42,7 +42,7 @@ void Connection::read() {
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
-            Logger::log(DEBUG, "connection.cpp", "read", "Reading untill new-line");
+            Logger::log(DEBUG, "connection.cpp", "read", "Reading until new-line");
             boost::asio::read_until( socket, buf, "\n" );
             Logger::log(DEBUG, "connection.cpp", "read", "New-line recieved");
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
