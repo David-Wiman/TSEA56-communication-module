@@ -13,7 +13,6 @@ bool exists(const json& j, const std::string& key) {
     return j.find(key) != j.end();
 }
 
-/* Establish a connection on specified port, not done until a client respondes */
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
   socket{io_service}, emergency_stop{false}, manual_instruction{false}, semi_instruction{false},
@@ -30,7 +29,6 @@ Connection::~Connection() {
     delete thread;
 }
 
-/* Reestablish connection, same operations as in constructor */
 void Connection::restart() {
     boost::asio::io_service io_service;
     tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port)); // listen for new connection
@@ -90,7 +88,6 @@ void Connection::read() {
     }
 }
 
-/* Send a string to the client */
 void Connection::write(const std::string& response) {
     const std::string msg = response + "\n";
     boost::asio::write( socket, boost::asio::buffer(response));
@@ -100,12 +97,10 @@ bool Connection::has_lost_connection() {
     return lost_connection.load();
 }
 
-/* Returns true if user pressed emergency stop */
 bool Connection::emergency_recieved() {
     return emergency_stop.load();
 }
 
-/* Functions to check if a new value exists*/
 bool Connection::new_manual_instruction() {
     return manual_instruction.load();
 }

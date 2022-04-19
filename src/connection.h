@@ -12,8 +12,10 @@
 
 using json = nlohmann::json;
 
+/* A socket connection to the user interface. */
 class Connection {
 public:
+    /* Establish a connection on specified port, not done until client responds */
     Connection(int port);
     ~Connection();
 
@@ -21,22 +23,33 @@ public:
     Connection(const Connection&) = delete;
     Connection operator=(const Connection&) = delete;
 
-    /* Basic function */
+    /* Reestablish connection, same operations as in constructor */
     void restart();
+    
+    /* Sends a string to the client */    
     void write(const std::string& response);
+
     bool has_lost_connection();
 
-    /* Emergency stop */
+    /* Returns 'true' if user pressed emergency stop */
     bool emergency_recieved();
 
-    /* New-functions */
+    /* Returns 'true' if a new manual instruction has been recieved*/
     bool new_manual_instruction();
+
+    /* Returns 'true' if a new manual instruction has been recieved*/
     bool new_semi_instruction();
+
+    /* Returns 'true' if a new manual instruction has been recieved*/
     bool new_auto_instruction();
 
-    /* Getters */
+    /* Returns latest ManualDriveInstruction recieved and resets new_manual_instruction */
     ManualDriveInstruction get_manual_drive_instruction();
+
+    /* Returns latest SemiDriveInstruction recieved and resets new_semi_instruction */
     SemiDriveInstruction get_semi_drive_instruction();
+
+    /* Returns latest AutoDriveInstruction recieved and resets new_auto_instruction */
     AutoDriveInstruction get_auto_drive_instruction();
 
 private:
@@ -49,11 +62,11 @@ private:
     boost::asio::ip::tcp::socket socket;
 
     /* Variables to check if a new instructions has come */
-    std::atomic<bool> emergency_stop;
     std::atomic<bool> manual_instruction;
     std::atomic<bool> semi_instruction;
     std::atomic<bool> auto_instruction;
 
+    std::atomic<bool> emergency_stop;
     std::atomic<bool> lost_connection;
 
     /* Variables to return upon request */
