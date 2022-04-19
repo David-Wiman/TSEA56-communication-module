@@ -17,6 +17,6 @@ std::string DriveData::format_json() {
         << ", \"speed\": " << speed
         << ", \"lateral_position\": " << lateral_position
         << ", \"angle\": " << angle << "}}" ;
-    std::string msg = oss.str();
-    return msg;
+
+    return oss.str();
 }
