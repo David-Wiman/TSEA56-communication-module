@@ -28,10 +28,12 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         uint16_t right_driving_distance{0};
         uint16_t left_speed{0};
         uint16_t right_speed{0};
+        bool found_obstacle_distance{false};
         for (int i=0; i<len; ++i) {
             switch (message_names[i]) {
                 case SENSOR_OBSTACLE_DISTANCE:
                     sensor_data.obstacle_distance = messages[i];
+                    found_obstacle_distance = true;
                     cout << "Read obstacle distance: "
                          << sensor_data.obstacle_distance << endl;
                     break;
@@ -80,6 +82,9 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
             sensor_data.speed = right_speed;
         } else {
             cout << "Warning: No speed recieved" << endl;
+        }
+        if (!found_obstacle_distance) {
+            cout << "Warning: No obstacle distance recieved" << endl;
         }
 
         // TODO should this be 1 if missing some data?
