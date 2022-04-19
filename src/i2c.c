@@ -36,7 +36,7 @@ void i2c_set_slave_addr(int slave_addr) {
         // ERROR HANDLING; you can check errno to see what went wrong
         return;
     }
-    printf("Set slave to %x\n", slave_addr);
+    i2c_log("Set slave to %x\n", slave_addr);
 }
 
 int i2c_read(uint16_t *message_names, uint16_t *messages) {
