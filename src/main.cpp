@@ -49,6 +49,8 @@ int main() {
         if (connection.has_lost_connection()) {
             break;
         }
+        DriveData drivedata = DriveData(0, 0, 0, sensor_data, camera_data);
+        connection.write(drivedata.format_json());
     }
 
     return 0;

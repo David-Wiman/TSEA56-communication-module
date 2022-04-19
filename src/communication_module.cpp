@@ -1,4 +1,6 @@
 #include "communication_module.h"
+
+#define MAX_INT 65535
 extern "C" {
     #include "i2c.h"
     #include "i2c_common.h"
@@ -26,8 +28,8 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         cout << "Read " << len << " packages" << endl;
         uint16_t left_driving_distance{0};
         uint16_t right_driving_distance{0};
-        uint16_t left_speed{0};
-        uint16_t right_speed{0};
+        uint16_t left_speed{MAX_INT};
+        uint16_t right_speed{MAX_INT};
         bool found_obstacle_distance{false};
         for (int i=0; i<len; ++i) {
             switch (message_names[i]) {
@@ -74,11 +76,11 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         } else {
             cout << "Warning: No driving distance recieved" << endl;
         }
-        if (left_speed && right_speed) {
+        if (left_speed != MAX_INT && right_speed != MAX_INT) {
             sensor_data.speed = (left_speed + right_speed) / 2;
-        } else if (left_speed) {
+        } else if (left_speed != MAX_INT) {
             sensor_data.speed = left_speed;
-        } else if (right_speed) {
+        } else if (right_speed != MAX_INT) {
             sensor_data.speed = right_speed;
         } else {
             cout << "Warning: No speed recieved" << endl;
