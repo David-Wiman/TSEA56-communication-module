@@ -19,12 +19,12 @@ Connection::Connection(int port)
   auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
-    Logger::log(INFO, "connection.cpp", "Connection", "Connection established");
+    Logger::log(INFO, __FILE__, "Connection", "Connection established");
     thread = new std::thread(&Connection::read, this);
 }
 
 Connection::~Connection() {
-    Logger::log(INFO, "connection.cpp", "Connection", "Connection terminated");
+    Logger::log(INFO, __FILE__, "Connection", "Connection terminated");
     thread->join();
     delete thread;
 }
@@ -42,15 +42,15 @@ void Connection::read() {
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
-            Logger::log(DEBUG, "connection.cpp", "read", "Reading until new-line");
+            Logger::log(DEBUG, __FILE__, "read", "Reading until new-line");
             boost::asio::read_until( socket, buf, "\n" );
-            Logger::log(DEBUG, "connection.cpp", "read", "New-line recieved");
+            Logger::log(DEBUG, __FILE__, "read", "New-line recieved");
             std::string request = boost::asio::buffer_cast<const char*>(buf.data());
-            Logger::log(DEBUG, "connection.cpp", "read", request);
+            Logger::log(DEBUG, __FILE__, "read", request);
 
             if (request == "STOP\n") {
                 // Emergency stop recieved, kill car
-                Logger::log(INFO, "connection.cpp", "read", "STOP recieved");
+                Logger::log(INFO, __FILE__, "read", "STOP recieved");
                 emergency_stop.store(true);
                 return;
             }
@@ -59,7 +59,7 @@ void Connection::read() {
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger::log(WARNING, "connection.cpp", "read", "Could not turn request into json object");
+                Logger::log(WARNING, __FILE__, "read", "Could not turn request into json object");
                 return;
             }
 
@@ -81,7 +81,7 @@ void Connection::read() {
                 auto_drive_instruction = inst;
             }
         } catch (const boost::exception&) {
-            Logger::log(ERROR, "connection.cpp", "read", "Connection lost");
+            Logger::log(ERROR, __FILE__, "read", "Connection lost");
             lost_connection.store(true);
             break;
         }
@@ -117,8 +117,8 @@ bool Connection::new_auto_instruction() {
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     manual_instruction.store(false);
-    Logger::log(INFO, "connection.cpp", "Throttle", manual_drive_instruction.get_throttle());
-    Logger::log(INFO, "connection.cpp", "Steering", manual_drive_instruction.get_steering());
+    Logger::log(INFO, __FILE__, "Throttle", manual_drive_instruction.get_throttle());
+    Logger::log(INFO, __FILE__, "Steering", manual_drive_instruction.get_steering());
     return manual_drive_instruction;
 }
 
