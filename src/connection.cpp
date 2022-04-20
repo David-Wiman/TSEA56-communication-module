@@ -15,8 +15,9 @@ bool exists(const json& j, const std::string& key) {
 
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
-  socket{io_service}, emergency_stop{false}, manual_instruction{false}, semi_instruction{false},
-  auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
+  socket{io_service}, emergency_stop{false}, parameters{false},
+  manual_instruction{false}, semi_instruction{false}, auto_instruction{false},
+  lost_connection{false}, parameter_configuration{}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
     Logger::log(INFO, __FILE__, "Connection", "Connection established");
@@ -63,7 +64,7 @@ void Connection::read() {
                 return;
             }
 
-            // Check what kind of instruction and create instance of appropriate class
+            // Check what kind of response and create instance of appropriate class
             if (exists(j, "ManualDriveInstruction")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 manual_instruction.store(true);
@@ -79,6 +80,11 @@ void Connection::read() {
                 auto_instruction.store(true);
                 AutoDriveInstruction inst{j};
                 auto_drive_instruction = inst;
+            } else if (exists(j, "ParameterConfiguration")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                parameters.store(true);
+                ParameterConfiguration config{j};
+                parameter_configuration = config;
             }
         } catch (const boost::exception&) {
             Logger::log(ERROR, __FILE__, "read", "Connection lost");
@@ -101,6 +107,10 @@ bool Connection::emergency_recieved() {
     return emergency_stop.load();
 }
 
+bool Connection::new_parameters() {
+    return parameters.load();
+}
+
 bool Connection::new_manual_instruction() {
     return manual_instruction.load();
 }
@@ -114,6 +124,15 @@ bool Connection::new_auto_instruction() {
 }
 
 /* Getters, sets new-values to false*/
+ParameterConfiguration Connection::get_parameter_configuration() {
+    std::lock_guard<std::mutex> lk(mtx);
+    parameters.store(false);
+    Logger::log(INFO, "connection.cpp", "Steering_kp", parameter_configuration.get_steering_kp());
+    Logger::log(INFO, "connection.cpp", "Steering_kd", parameter_configuration.get_steering_kd());
+    Logger::log(INFO, "connection.cpp", "Speed_kp", parameter_configuration.get_speed_kp());
+    return parameter_configuration;
+}
+
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     manual_instruction.store(false);
