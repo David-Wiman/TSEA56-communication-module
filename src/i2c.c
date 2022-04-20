@@ -13,17 +13,20 @@ int file_i2c;
 FILE *i2c_logfile;
 
 void i2c_init() {
+    // Start logging
+    i2c_logfile = fopen("log/i2c_log.txt", "a");
+    if (i2c_logfile == NULL) {
+        printf("Failed to open i2c log file\n");
+        return;
+    }
+
+    // Initiate bus
     char *filename = (char*)"/dev/i2c-1";
     if ((file_i2c = open(filename, O_RDWR)) < 0) {
         printf("Failed to open the i2c bus\n");
         return;
     }
-    i2c_logfile = fopen("i2c_log.txt", "a");
-    if (i2c_logfile == NULL) {
-        printf("Failed to open i2c log file\n");
-        return;
-    }
-    i2c_log("\nSuccessfully initiated I2C bus\n");
+    i2c_log("\n\nSuccessfully initiated I2C bus\n");
 }
 
 void i2c_close() {
@@ -59,7 +62,7 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
         }
     } else {
         i2c_log("Failed to get message length (code %d)\n", code);
-        return -1;
+        return -2;
     }
 
     code = read(file_i2c, buffer8, len);

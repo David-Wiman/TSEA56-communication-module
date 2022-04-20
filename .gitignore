@@ -2,3 +2,4 @@ build
 *.out
 log/log*
 .vscode
+log/i2c_log.txt

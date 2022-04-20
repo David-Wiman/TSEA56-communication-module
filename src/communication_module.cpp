@@ -1,12 +1,14 @@
 #include "communication_module.h"
+#include "log.h"
 
-#define MAX_INT 65535
 extern "C" {
     #include "i2c.h"
     #include "i2c_common.h"
 }
 
-#include <iostream>
+#include <sstream>
+
+#define MAX_INT 65535
 
 using namespace std;
 
@@ -25,7 +27,7 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
     uint16_t messages[16];
     int len = i2c_read(message_names, messages);
     if (len > 0) {
-        cout << "Read " << len << " packages" << endl;
+        Logger::log(INFO, __FILE__, "I2C", "Read sensor data");
         uint16_t left_driving_distance{0};
         uint16_t right_driving_distance{0};
         uint16_t left_speed{MAX_INT};
@@ -36,32 +38,22 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
                 case SENSOR_OBSTACLE_DISTANCE:
                     sensor_data.obstacle_distance = messages[i];
                     found_obstacle_distance = true;
-                    cout << "Read obstacle distance: "
-                         << sensor_data.obstacle_distance << endl;
                     break;
                 case SENSOR_LEFT_DRIVING_DISTANCE:
                     left_driving_distance = messages[i];
-                    cout << "Read left driving distance: "
-                         << messages[i] << endl;
                     break;
                 case SENSOR_RIGHT_DRIVING_DISTANCE:
                     right_driving_distance = messages[i];
-                    cout << "Read right driving distance: "
-                         << messages[i] << endl;
                     break;
                 case SENSOR_LEFT_SPEED:
                     left_speed = messages[i];
-                    cout << "Read left speed: "
-                         << messages[i] << endl;
                     break;
                 case SENSOR_RIGHT_SPEED:
                     right_speed = messages[i];
-                    cout << "Read right speed: "
-                         << messages[i] << endl;
                     break;
                 default:
-                    cout << "Warning: Unexpected value read from sensor module "
-                         << "value = " << messages[i] << endl;
+                    Logger::log(WARNING, __FILE__, "I2C", "Unexpected value read from sensor module ");
+                    Logger::log(WARNING, __FILE__, "I2C", messages[i]);
                     break;
             }
         }
@@ -74,7 +66,7 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         } else if (right_driving_distance) {
             sensor_data.driving_distance = right_driving_distance;
         } else {
-            cout << "Warning: No driving distance recieved" << endl;
+            Logger::log(WARNING, __FILE__, "I2C", "No driving distance recieved");
         }
         if (left_speed != MAX_INT && right_speed != MAX_INT) {
             sensor_data.speed = (left_speed + right_speed) / 2;
@@ -83,19 +75,29 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         } else if (right_speed != MAX_INT) {
             sensor_data.speed = right_speed;
         } else {
-            cout << "Warning: No speed recieved" << endl;
+            Logger::log(WARNING, __FILE__, "I2C", "No speed recieved");
         }
         if (!found_obstacle_distance) {
-            cout << "Warning: No obstacle distance recieved" << endl;
+            Logger::log(WARNING, __FILE__, "I2C", "No obstacle distance recieved");
         }
+
+        // Log sensor data
+        stringstream ss;
+        ss << "Sensor data:"
+           << "\n\tobstacle distance: " << sensor_data.obstacle_distance
+           << "\n\tdriving distance: " << sensor_data.driving_distance
+           << "\n\tspeed: " << sensor_data.speed;
+        Logger::log(INFO, __FILE__, "I2C", ss.str());
 
         // TODO should this be 1 if missing some data?
         return 0;
     } else if (len == 0) {
-        cout << "Warning: Slave has no new data." << endl;
+        Logger::log(WARNING, __FILE__, "I2C", "Sensor module has no new data.");
         return 1;
+    } else if (len == -2) {
+        Logger::log(ERROR, __FILE__, "I2C", "Failed to get message length from sensor module");
     } else {
-        cout << "I2C Error: " << len << endl;
+        Logger::log(ERROR, __FILE__, "I2C", "Can't read from sensor module");
         return -1;
     }
 
