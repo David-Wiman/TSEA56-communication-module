@@ -1,6 +1,8 @@
 #include "drivedata.h"
 #include "connection.h"
+#include "parameterconfiguration.h"
 #include "manualdriveinstruction.h"
+#include "semidriveinstruction.h"
 #include "drivedata.h"
 #include "log.h"
 #include "communication_module.h"
