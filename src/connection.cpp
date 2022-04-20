@@ -15,8 +15,8 @@ bool exists(const json& j, const std::string& key) {
 
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
-  socket{io_service}, emergency_stop{false}, parameters{false},
-  manual_instruction{false}, semi_instruction{false}, auto_instruction{false},
+  socket{io_service}, parameters{false}, manual_instruction{false},
+  semi_instruction{false}, auto_instruction{false}, emergency_stop{false},
   lost_connection{false}, parameter_configuration{}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
@@ -144,6 +144,8 @@ ManualDriveInstruction Connection::get_manual_drive_instruction() {
 SemiDriveInstruction Connection::get_semi_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     semi_instruction.store(false);
+    Logger::log(INFO, "connection.cpp", "Direction", semi_drive_instruction.get_direction());
+    Logger::log(INFO, "connection.cpp", "Id", semi_drive_instruction.get_id());
     return semi_drive_instruction;
 }
 
