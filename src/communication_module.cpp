@@ -87,7 +87,7 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
            << "\n\tobstacle distance: " << sensor_data.obstacle_distance
            << "\n\tdriving distance: " << sensor_data.driving_distance
            << "\n\tspeed: " << sensor_data.speed;
-        Logger::log(INFO, __FILE__, "I2C", ss.str());
+        Logger::log(DEBUG, __FILE__, "I2C", ss.str());
 
         // TODO should this be 1 if missing some data?
         return 0;
