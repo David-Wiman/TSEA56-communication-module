@@ -23,6 +23,7 @@ extern "C" {
 
 using namespace std;
 using json = nlohmann::json;
+using steady_clock = chrono::steady_clock;
 
 int main() {
 
@@ -30,12 +31,20 @@ int main() {
     Logger::init();
     i2c_init();
     Connection connection{1234};
+
+    // Connection recieved, start clock
+    steady_clock::time_point start_time = steady_clock::now();
+
     ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{5};
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
     image_proc_t image_data{};
+    
+    int elapsed_time{0};
+    int16_t throttle{0};
+    int16_t steering{0};
 
     while (true) {
 
@@ -50,8 +59,8 @@ int main() {
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-            int16_t throttle = instruction.get_throttle();
-            int16_t steering = instruction.get_steering();
+            throttle = instruction.get_throttle();
+            steering = instruction.get_steering();
             com.send_manual_instruction(throttle, steering);
         } else if (connection.new_semi_instruction()) {
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
@@ -77,7 +86,14 @@ int main() {
         if (finished_instruction_id != "") {
             Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
         }
-        DriveData drivedata = DriveData(0, 0, 0, sensor_data, image_data.lateral_position, ref.angle);
+        
+        // Calculate time in seconds since client connection (start)
+        auto time_diff = steady_clock::now() - start_time;
+        elapsed_time = chrono::duration_cast<chrono::seconds>(time_diff).count();
+        
+        DriveData drivedata = DriveData(elapsed_time, throttle, steering,
+                                        sensor_data, image_data.lateral_position,
+                                        ref.angle);
         connection.write(drivedata.format_json());
 
         com.throttle();
