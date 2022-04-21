@@ -130,6 +130,7 @@ ParameterConfiguration Connection::get_parameter_configuration() {
     Logger::log(INFO, "connection.cpp", "Steering_kp", parameter_configuration.get_steering_kp());
     Logger::log(INFO, "connection.cpp", "Steering_kd", parameter_configuration.get_steering_kd());
     Logger::log(INFO, "connection.cpp", "Speed_kp", parameter_configuration.get_speed_kp());
+    Logger::log(INFO, "connection.cpp", "Speed_ki", parameter_configuration.get_speed_ki());
     return parameter_configuration;
 }
 
