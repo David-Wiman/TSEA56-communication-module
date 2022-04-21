@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 
 #include "connection.h"
 #include "log.h"
@@ -10,6 +11,7 @@ using std::endl;
 
 /* Check if a given key exists in an json object */
 bool exists(const json& j, const std::string& key) {
+    // This will throw an uncatchable error if json is malformed
     return j.find(key) != j.end();
 }
 
@@ -60,8 +62,14 @@ void Connection::read() {
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger::log(WARNING, __FILE__, "read", "Could not turn request into json object");
-                return;
+                Logger::log(WARNING, "connection.cpp", "read",
+                            "Could not turn request into json object");
+                continue;
+            } catch (std::exception& e) {
+                Logger::log(ERROR, "connection.cpp", "read",
+                            "Uncaught exception in json parsing");
+                Logger::log(DEBUG, "connection.cpp", "read", e.what());
+                break;
             }
 
             // Check what kind of response and create instance of appropriate class
@@ -92,6 +100,9 @@ void Connection::read() {
             break;
         }
     }
+
+    // Socket left loop, error has occured
+    Logger::log(ERROR, "connection.cpp", "read", "Socket read interrupted");
 }
 
 void Connection::write(const std::string& response) {

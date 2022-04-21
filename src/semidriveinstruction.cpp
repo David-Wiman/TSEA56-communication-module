@@ -19,6 +19,14 @@ drive_instruction_t SemiDriveInstruction::get_drive_instruction() const {
     return instruction;
 }
 
+int SemiDriveInstruction::get_direction() const {
+    return instruction.number;
+}
+
+std::string SemiDriveInstruction::get_id() const {
+    return instruction.id;
+}
+
 ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruction) {
     const array<string, 3> instruction_names{"Left", "Forward", "Right"};
     drive_instruction_t instruction = semi_drive_instruction.get_drive_instruction();
