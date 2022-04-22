@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <chrono>
+#include <thread>
 
 #include "drivedata.h"
 
@@ -7,10 +9,15 @@
 
 class CommunicationModule {
 public:
-    CommunicationModule() {}
+    CommunicationModule(int fps);
 
     static int get_sensor_data(sensor_data_t &sensor_data);
     static void send_manual_instruction(uint16_t throttle, uint16_t steering);
+    void throttle();
+
+private:
+    int cycle_time;
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
 };
 
 #endif  // COMMUNICATOIN_MODULE_H

@@ -12,6 +12,11 @@ extern "C" {
 
 using namespace std;
 
+CommunicationModule::CommunicationModule(int fps)
+: cycle_time{1/fps}, start_time{chrono::high_resolution_clock::now()} {
+    Logger::log(INFO, __FILE__, "COM", "Initiating communication module");
+}
+
 void CommunicationModule::send_manual_instruction(uint16_t throttle, uint16_t steering) {
     i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
     uint16_t buffer[] = {
@@ -100,6 +105,25 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         Logger::log(ERROR, __FILE__, "I2C", "Can't read from sensor module");
         return -1;
     }
+    return 0;
+}
 
+void CommunicationModule::throttle() {
+    const auto now = chrono::high_resolution_clock::now();
+    double t_delta = chrono::duration<double, std::milli>(now-start_time).count();
+    double cycle_time{200};
+    stringstream ss{};
+    ss << "Program cycle took " << t_delta << " ms";
+    Logger::log(INFO, __FILE__, "COM", ss.str());
+    ss.str("");
+    if (t_delta < cycle_time) {
+        ss << "Sleeping for " << cycle_time - t_delta << " ms";
+        Logger::log(INFO, __FILE__, "COM", ss.str());
+        int ms = static_cast<int>(cycle_time - t_delta);
+        this_thread::sleep_for(chrono::milliseconds(ms));
+    } else {
+        Logger::log(WARNING, __FILE__, "COM", "Program cycle time exceeded");
+    }
+    start_time = now;
 }
 
