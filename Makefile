@@ -52,6 +52,7 @@ main: subdirs base $(OBJ_DIR)/$(MAINOBJ)
 subdirs: $(SUBDIRS)
 
 $(SUBDIRS):
+	@ rm -f $@/$(OBJ_DIR)/$(MAINOBJ)
 	$(MAKE) base -C $@
 
 # Compile everything except mainfile
