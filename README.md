@@ -19,3 +19,11 @@ Build and run:
 make -j4
 ./main.out
 ```
+
+## User groups
+If a user other than pi wants to run this program they have to be in some groups.
+```
+sudo adduser USERNAME gpio
+sudo adduser USERNAME i2c
+sudo adduser USERNAME video
+```
