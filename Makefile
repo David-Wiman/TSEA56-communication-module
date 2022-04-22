@@ -7,7 +7,7 @@ CC_CPP = g++
 CC_C = gcc
 
 # Other include directories with headers
-INC := -Icommon -Ilogger/src
+INC := -Icommon -isystemlogger/src -isystemimage-processing-module/src
 
 # Compiling flags
 CPPFLAGS += -Wno-deprecated-declarations -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -Woverloaded-virtual -fmax-errors=3 -g
@@ -17,7 +17,8 @@ CFLAGS := -Wall -Wextra -pedantic
 CFLAGS += $(INC)
 
 # Linking flags
-LDFLAGS += -lboost_system -lpthread
+OPENCV += -lopencv_core -lopencv_video -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_highgui
+LDFLAGS += -lboost_system -lpthread $(OPENCV)
 
 # File which contains the main function
 MAINFILE := main.cpp
@@ -34,7 +35,8 @@ ALL_OBJS := $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ)
 DEPS := $(patsubst %.o, %.d, $(ALL_OBJS))
 
 # For handling recursive directories
-SUBDIRS := logger
+SUBDIRS := logger image-processing-module
+
 CCFLAGS += $(foreach d, $(SUBDIRS), -I$(d)/src)
 SUBDIR_OBJS = $(wildcard $(foreach d, $(SUBDIRS), $(d)/$(OBJ_DIR)/*.o))
 
