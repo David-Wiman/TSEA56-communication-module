@@ -33,7 +33,6 @@ int main() {
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
-    camera_data_t camera_data{};
     image_proc_t image_data{};
 
     while (true) {
@@ -59,7 +58,7 @@ int main() {
             cout << "Recieved direction: " << instruction.get_direction() << endl;
             cout << "Recieved id: " << instruction.get_id() << endl; 
 
-            // Process instruction here
+            // TODO control_center.add_new_instruction()
         } else {
             //cout << "No new instruction" << endl;
         }
@@ -67,7 +66,9 @@ int main() {
         if (connection.has_lost_connection()) {
             break;
         }
-        DriveData drivedata = DriveData(0, 0, 0, sensor_data, camera_data);
+
+        reference_t ref = control_center(sensor_data, image_data);
+        DriveData drivedata = DriveData(0, 0, 0, sensor_data, image_data.lateral_position, ref.angle);
         connection.write(drivedata.format_json());
 
         com.throttle();
