@@ -4,3 +4,6 @@
 [submodule "image-processing-module"]
 	path = image-processing-module
 	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/image-processing-module.git
+[submodule "common"]
+	path = common
+	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/common.git
