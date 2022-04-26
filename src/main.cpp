@@ -28,7 +28,8 @@ int main() {
     Logger::init();
     i2c_init();
     Connection connection{1234};
-    ImageProcessing image_processor{false};
+    cout << "Create image processor" << endl;
+    ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{5};
     ControlCenter control_center{};
 
