@@ -36,9 +36,9 @@ ALL_OBJS := $(CPP_OBJS) $(C_OBJS) $(OBJ_DIR)/$(MAINOBJ)
 DEPS := $(patsubst %.o, %.d, $(ALL_OBJS))
 
 # For handling recursive directories
-SUBDIRS := logger image-processing-module
+SUBDIRS := logger image-processing-module control-center
 
-CCFLAGS += $(foreach d, $(SUBDIRS), -I$(d)/src)
+CPPFLAGS += $(foreach d, $(SUBDIRS), -I$(d)/src)
 SUBDIR_OBJS = $(wildcard $(foreach d, $(SUBDIRS), $(d)/$(OBJ_DIR)/*.o))
 
 # Main objetice - created with 'make' or 'make main'.

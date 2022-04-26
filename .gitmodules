@@ -7,3 +7,6 @@
 [submodule "common"]
 	path = common
 	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/common.git
+[submodule "control-center"]
+	path = control-center
+	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/control-center.git

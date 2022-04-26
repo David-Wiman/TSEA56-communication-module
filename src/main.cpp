@@ -6,6 +6,7 @@
 #include "log.h"
 #include "communication_module.h"
 #include "image_processing.h"
+#include "control_center.h"
 
 extern "C" {
     #include "i2c.h"
@@ -29,6 +30,7 @@ int main() {
     Connection connection{1234};
     ImageProcessing image_processor{false};
     CommunicationModule com{5};
+    ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
     camera_data_t camera_data{};
