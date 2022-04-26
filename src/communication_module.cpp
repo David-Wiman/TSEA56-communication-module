@@ -124,6 +124,6 @@ void CommunicationModule::throttle() {
     } else {
         Logger::log(WARNING, __FILE__, "COM", "Program cycle time exceeded");
     }
-    start_time = now;
+    start_time = chrono::high_resolution_clock::now();
 }
 
