@@ -54,6 +54,8 @@ subdirs: $(SUBDIRS)
 
 $(SUBDIRS):
 	@ rm -f $@/$(OBJ_DIR)/$(MAINOBJ)
+	@ rm -f $@/$(OBJ_DIR)/check.o
+	@ rm -f $@/$(OBJ_DIR)/tests.o
 	$(MAKE) base -C $@
 
 # Compile everything except mainfile

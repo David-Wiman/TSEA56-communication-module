@@ -1,4 +1,3 @@
-#include "i2c_common.h"
 #include "drivedata.h"
 #include "connection.h"
 #include "manualdriveinstruction.h"
@@ -7,6 +6,7 @@
 #include "communication_module.h"
 #include "image_processing.h"
 #include "control_center.h"
+#include "raspi_common.h"
 
 extern "C" {
     #include "i2c.h"
