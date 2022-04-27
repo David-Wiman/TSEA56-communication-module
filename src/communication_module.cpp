@@ -32,7 +32,7 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
     uint16_t messages[16];
     int len = i2c_read(message_names, messages);
     if (len > 0) {
-        Logger::log(INFO, __FILE__, "I2C", "Read sensor data");
+        Logger::log(DEBUG, __FILE__, "I2C", "Read sensor data");
         uint16_t left_driving_distance{0};
         uint16_t right_driving_distance{0};
         uint16_t left_speed{MAX_INT};

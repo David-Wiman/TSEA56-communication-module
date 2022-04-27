@@ -1,4 +1,5 @@
 #include <nlohmann/json.hpp>
+#include <iostream>
 
 #include "semidriveinstruction.h"
 
@@ -9,7 +10,7 @@ SemiDriveInstruction::SemiDriveInstruction(): instruction{} {}
 
 SemiDriveInstruction::SemiDriveInstruction(const json& j): instruction{} {
     int direction = *j["SemiDriveInstruction"].find("direction");
-    int id = *j["SemiDriveInstruction"].find("id");
+    string id = *j["SemiDriveInstruction"].find("id");
     instruction.number = static_cast<instruction::InstructionNumber>(direction);
     instruction.id = id;
 }
@@ -23,7 +24,7 @@ ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruct
     drive_instruction_t instruction = semi_drive_instruction.get_drive_instruction();
 
     os << "Instruction: " << instruction_names.at(instruction.number) 
-        << "ID: " << instruction.id;
+        << ", ID: " << instruction.id;
     return os;
 }
 
