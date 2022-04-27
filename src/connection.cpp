@@ -62,13 +62,13 @@ void Connection::read() {
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger::log(WARNING, "connection.cpp", "read",
+                Logger::log(WARNING, __FILE__, "read",
                             "Could not turn request into json object");
                 continue;
             } catch (std::exception& e) {
-                Logger::log(ERROR, "connection.cpp", "read",
+                Logger::log(ERROR, __FILE__, "read",
                             "Uncaught exception in json parsing");
-                Logger::log(DEBUG, "connection.cpp", "read", e.what());
+                Logger::log(DEBUG, __FILE__, "read", e.what());
                 break;
             }
 
@@ -102,7 +102,7 @@ void Connection::read() {
     }
 
     // Socket left loop, error has occured
-    Logger::log(ERROR, "connection.cpp", "read", "Socket read interrupted");
+    Logger::log(ERROR, __FILE__, "read", "Socket read interrupted");
 }
 
 void Connection::write(const std::string& response) {
@@ -138,10 +138,10 @@ bool Connection::new_auto_instruction() {
 ParameterConfiguration Connection::get_parameter_configuration() {
     std::lock_guard<std::mutex> lk(mtx);
     parameters.store(false);
-    Logger::log(INFO, "connection.cpp", "Steering_kp", parameter_configuration.get_steering_kp());
-    Logger::log(INFO, "connection.cpp", "Steering_kd", parameter_configuration.get_steering_kd());
-    Logger::log(INFO, "connection.cpp", "Speed_kp", parameter_configuration.get_speed_kp());
-    Logger::log(INFO, "connection.cpp", "Speed_ki", parameter_configuration.get_speed_ki());
+    Logger::log(INFO, __FILE__, "Steering_kp", parameter_configuration.get_steering_kp());
+    Logger::log(INFO, __FILE__, "Steering_kd", parameter_configuration.get_steering_kd());
+    Logger::log(INFO, __FILE__, "Speed_kp", parameter_configuration.get_speed_kp());
+    Logger::log(INFO, __FILE__, "Speed_ki", parameter_configuration.get_speed_ki());
     return parameter_configuration;
 }
 
@@ -156,8 +156,8 @@ ManualDriveInstruction Connection::get_manual_drive_instruction() {
 SemiDriveInstruction Connection::get_semi_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     semi_instruction.store(false);
-    Logger::log(INFO, "connection.cpp", "Direction", semi_drive_instruction.get_direction());
-    Logger::log(INFO, "connection.cpp", "Id", semi_drive_instruction.get_id());
+    Logger::log(INFO, __FILE__, "Direction", semi_drive_instruction.get_direction());
+    Logger::log(INFO, __FILE__, "Id", semi_drive_instruction.get_id());
     return semi_drive_instruction;
 }
 
