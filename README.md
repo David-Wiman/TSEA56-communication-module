@@ -6,7 +6,7 @@ sudo apt install nlohmann-json3-dev
 
 Setup this repository:
 ```
-git clone --recursive-submodules git@gitlab.liu.se:da-proj/TSEA56/2022/G08/communication-module.git
+git clone --recurse-submodules git@gitlab.liu.se:da-proj/TSEA56/2022/G08/communication-module.git
 ```
 or
 ```
