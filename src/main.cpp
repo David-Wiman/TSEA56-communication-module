@@ -55,7 +55,7 @@ int main() {
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
             stringstream ss{};
             ss << instruction;
-            Logger::log(INFO, __FILE__, "SemiDriveInstruction", ss.str());
+            Logger::log(INFO, __FILE__, "New (semi-auto) instruction", ss.str());
 
             control_center.add_drive_instruction(instruction.get_drive_instruction());
         } else {
@@ -71,6 +71,10 @@ int main() {
         image_data = image_processor.process_next_frame();
 
         reference_t ref = control_center(sensor_data, image_data);
+        string finished_instruction_id = control_center.get_finished_instruction_id();
+        if (finished_instruction_id != "") {
+            Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+        }
         DriveData drivedata = DriveData(0, 0, 0, sensor_data, image_data.lateral_position, ref.angle);
         connection.write(drivedata.format_json());
 
