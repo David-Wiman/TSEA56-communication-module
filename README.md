@@ -27,3 +27,46 @@ sudo adduser USERNAME gpio
 sudo adduser USERNAME i2c
 sudo adduser USERNAME video
 ```
+
+# Logs
+Logs can be found in the `log` directory.
+
+| Filename      | Description |
+|---------------|-------------|
+| `log.txt`     | General log |
+| `i2c_log.txt` | Low level I2C log |
+
+## Reading logs
+Some usefull unix commands for reading logs:
+
+Show the entire log:
+```
+cat log/log.txt
+```
+
+Show the log in real time (follow as it updates)
+```
+tail -f log/log.txt
+```
+
+Show the log, but only the lines that contains INFO
+```
+cat log/log.txt | grep "INFO"
+# or
+grep "INFO" log/log.txt
+```
+
+Show the log, but only the lines that contains ERROR, WARNING or INFO
+```
+grep -E "ERROR|WARNING|INFO" log/log.txt
+```
+
+Show the log, but highligt ERROR, WARNING and INFO
+```
+grep -E "ERROR|WARNING|INFO|" log/log.txt
+```
+
+Show the log in real time, but only the lines that contains ERROR, WARNING or INFO
+```
+tail -f log/log.txt | grep -E "ERROR|WARNING|INFO"
+```
