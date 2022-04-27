@@ -28,7 +28,6 @@ int main() {
     Logger::init();
     i2c_init();
     Connection connection{1234};
-    cout << "Create image processor" << endl;
     ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{5};
     ControlCenter control_center{};
@@ -37,8 +36,6 @@ int main() {
     image_proc_t image_data{};
 
     while (true) {
-
-        image_data = image_processor.process_next_frame();
 
         if (connection.emergency_recieved()) {
             cout << "Emergency stop recieved!" << endl;
@@ -56,17 +53,22 @@ int main() {
             com.send_manual_instruction(throttle, steering);
         } else if (connection.new_semi_instruction()) {
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
-            cout << "Recieved direction: " << instruction.get_direction() << endl;
-            cout << "Recieved id: " << instruction.get_id() << endl; 
+            stringstream ss{};
+            ss << instruction;
+            Logger::log(INFO, __FILE__, "SemiDriveInstruction", ss.str());
 
-            // TODO control_center.add_new_instruction()
+            control_center.add_drive_instruction(instruction.get_drive_instruction());
         } else {
             //cout << "No new instruction" << endl;
         }
 
         if (connection.has_lost_connection()) {
+            Logger::log(ERROR, __FILE__, "Main", "Lost connection to user interface, exit.");
             break;
         }
+
+
+        image_data = image_processor.process_next_frame();
 
         reference_t ref = control_center(sensor_data, image_data);
         DriveData drivedata = DriveData(0, 0, 0, sensor_data, image_data.lateral_position, ref.angle);

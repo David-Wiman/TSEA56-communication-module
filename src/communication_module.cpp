@@ -114,11 +114,11 @@ void CommunicationModule::throttle() {
     double cycle_time{200};
     stringstream ss{};
     ss << "Program cycle took " << t_delta << " ms";
-    Logger::log(INFO, __FILE__, "COM", ss.str());
+    Logger::log(DEBUG, __FILE__, "COM", ss.str());
     ss.str("");
     if (t_delta < cycle_time) {
         ss << "Sleeping for " << cycle_time - t_delta << " ms";
-        Logger::log(INFO, __FILE__, "COM", ss.str());
+        Logger::log(DEBUG, __FILE__, "COM", ss.str());
         int ms = static_cast<int>(cycle_time - t_delta);
         this_thread::sleep_for(chrono::milliseconds(ms));
     } else {

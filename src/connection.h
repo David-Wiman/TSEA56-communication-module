@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <atomic>
 
+#include "raspi_common.h"
 #include "manualdriveinstruction.h"
 #include "semidriveinstruction.h"
 #include "autodriveinstruction.h"
@@ -25,8 +26,8 @@ public:
 
     /* Reestablish connection, same operations as in constructor */
     void restart();
-    
-    /* Sends a string to the client */    
+
+    /* Sends a string to the client */
     void write(const std::string& response);
 
     bool has_lost_connection();

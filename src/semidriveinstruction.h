@@ -4,22 +4,19 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
+#include "raspi_common.h"
+
 class SemiDriveInstruction {
 public:
     SemiDriveInstruction();
     SemiDriveInstruction(const nlohmann::json& j);
 
-    /* Available directions the car can drive in the autonomous modes */
-    enum DIRECTION {LEFT, FORWARD, RIGHT};
-
-    /* Returns direction, 0->left, 1->forward and 2->right */
-    int get_direction();
-
-    std::string& get_id();
+    drive_instruction_t get_drive_instruction() const;
 
 private:
-    int direction; // 0->left, 1->fwrd, 2->right
-    std::string id;
+    drive_instruction_t instruction;
 };
+
+std::ostream& operator<<(std::ostream &os, SemiDriveInstruction const &semi_drive_instruction);
 
 #endif  // SEMIDRIVEINSTRUCTION_H

@@ -5,20 +5,25 @@
 using namespace std;
 using json = nlohmann::json;
 
-SemiDriveInstruction::SemiDriveInstruction()
-:direction{}, id{} {}
+SemiDriveInstruction::SemiDriveInstruction(): instruction{} {}
 
-SemiDriveInstruction::SemiDriveInstruction(const json& j)
-:direction{}, id{} {
-    direction = *j["SemiDriveInstruction"].find("direction");
-    id = *j["SemiDriveInstruction"].find("id");
+SemiDriveInstruction::SemiDriveInstruction(const json& j): instruction{} {
+    int direction = *j["SemiDriveInstruction"].find("direction");
+    int id = *j["SemiDriveInstruction"].find("id");
+    instruction.number = static_cast<instruction::InstructionNumber>(direction);
+    instruction.id = id;
 }
 
-int SemiDriveInstruction::get_direction() {
-    return direction;
+drive_instruction_t SemiDriveInstruction::get_drive_instruction() const {
+    return instruction;
 }
 
-string& SemiDriveInstruction::get_id() {
-    return id;
+ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruction) {
+    const array<string, 3> instruction_names{"Left", "Forward", "Right"};
+    drive_instruction_t instruction = semi_drive_instruction.get_drive_instruction();
+
+    os << "Instruction: " << instruction_names.at(instruction.number) 
+        << "ID: " << instruction.id;
+    return os;
 }
 
