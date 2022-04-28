@@ -85,6 +85,7 @@ int main() {
         string finished_instruction_id = control_center.get_finished_instruction_id();
         if (finished_instruction_id != "") {
             Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+            connection.send_instruction_id(finished_instruction_id);
         }
         
         // Calculate time in seconds since client connection (start)

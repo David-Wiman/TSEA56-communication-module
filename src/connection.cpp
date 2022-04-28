@@ -110,6 +110,12 @@ void Connection::write(const std::string& response) {
     boost::asio::write( socket, boost::asio::buffer(response));
 }
 
+void Connection::send_instruction_id(const std::string& id) {
+    std::ostringstream oss;
+    oss << "{\"InstructionId\": \"" << id << "\"}" ;
+    write(oss.str());
+}
+
 bool Connection::has_lost_connection() {
     return lost_connection.load();
 }

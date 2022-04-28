@@ -31,6 +31,9 @@ public:
     /* Sends a string to the client */
     void write(const std::string& response);
 
+    /* Sends a instruction id to client */
+    void send_instruction_id(const std::string& id);
+
     bool has_lost_connection();
 
     /* Returns 'true' if user pressed emergency stop */
