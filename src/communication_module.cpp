@@ -39,6 +39,21 @@ void CommunicationModule::send_auto_instruction(
     i2c_write(buffer, sizeof(buffer)/sizeof(uint16_t));
 }
 
+void CommunicationModule::send_regulation_constants(
+        int steeringKP, int steeringKD, int speedKP,
+        int speedKI, int turnKP, int turnKD) {
+    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
+    uint16_t buffer[] = {
+        STEERING_STEERING_KP, package_signed(steeringKP),
+        STEERING_STEERING_KD, package_signed(steeringKD),
+        STEERING_SPEED_KP, package_signed(speedKP),
+        STEERING_SPEED_KI, package_signed(speedKI),
+        STEERING_TURN_KP, package_signed(turnKP),
+        STEERING_TURN_KD, package_signed(turnKD)
+    };
+    i2c_write(buffer, sizeof(buffer)/sizeof(uint16_t));
+}
+
 int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
     i2c_set_slave_addr(SENSOR_MODULE_SLAVE_ADDRESS);
     uint16_t message_names[16];
