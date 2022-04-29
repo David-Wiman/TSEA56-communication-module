@@ -55,7 +55,7 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
             return -1;
         } else if (len == 0) {
             i2c_log("Warning: Slave does not want to transmit data.\n");
-            return -1;
+            return 0;
         } else if (len < 0) {
             i2c_log("Errorlen < 0: Slave wants to transmit %d bytes\n", len);
             return -1;
