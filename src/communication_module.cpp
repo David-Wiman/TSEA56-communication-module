@@ -101,7 +101,7 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
         } else {
             Logger::log(WARNING, __FILE__, "I2C", "No driving distance recieved");
         }
-        if (left_speed != MAX_INT && right_speed != MAX_INT) {
+        if ((left_speed != MAX_INT) && (right_speed != MAX_INT)) {
             sensor_data.speed = (left_speed + right_speed) / 2;
         } else if (left_speed != MAX_INT) {
             sensor_data.speed = left_speed;
