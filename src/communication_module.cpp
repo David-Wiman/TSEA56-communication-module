@@ -20,10 +20,23 @@ CommunicationModule::CommunicationModule(int fps)
 void CommunicationModule::send_manual_instruction(uint16_t throttle, uint16_t steering) {
     i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
     uint16_t buffer[] = {
-        STEERING_MANUAL_GAS, package_signed(throttle),
-        STEERING_MANUAL_ANG, package_signed(steering)
+        STEERING_MANUAL_GAS, throttle,
+        STEERING_MANUAL_ANG, steering
     };
     i2c_write(buffer, 4);
+}
+
+void CommunicationModule::send_auto_instruction(
+        reference_t ref, int speed, int lat) {
+    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
+    uint16_t buffer[] = {
+        STEERING_CUR_VEL, package_signed(speed),
+        STEERING_REF_VEL, package_signed(ref.speed),
+        STEERING_CUR_ANG, package_signed(ref.angle),
+        STEERING_CUR_LAT, package_signed(lat),
+        STEERING_REGULATION_MODE, package_signed(ref.regulation_mode)
+    };
+    i2c_write(buffer, sizeof(buffer)/sizeof(uint16_t));
 }
 
 int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {

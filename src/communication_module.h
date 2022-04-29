@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "drivedata.h"
+#include "raspi_common.h"
 
 #ifndef COMMUNICATION_MODULE_H
 #define COMMUNICATION_MODULE_H
@@ -13,6 +14,7 @@ public:
 
     static int get_sensor_data(sensor_data_t &sensor_data);
     static void send_manual_instruction(uint16_t throttle, uint16_t steering);
+    static void send_auto_instruction(reference_t ref, int speed, int lateral_position);
     void throttle();
 
 private:
