@@ -3,3 +3,4 @@ build
 log/log*
 .vscode
 log/i2c_log.txt
+*.swp
