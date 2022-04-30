@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <exception>
 
 #include "connection.h"
@@ -62,7 +63,7 @@ void Connection::read() {
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger::log(WARNING, __FILE__, "read",
+                Logger::log(ERROR, __FILE__, "read",
                             "Could not turn request into json object");
                 continue;
             } catch (std::exception& e) {
@@ -96,13 +97,13 @@ void Connection::read() {
             }
         } catch (const boost::exception&) {
             Logger::log(ERROR, __FILE__, "read", "Connection lost");
-            lost_connection.store(true);
             break;
         }
     }
 
     // Socket left loop, error has occured
     Logger::log(ERROR, __FILE__, "read", "Socket read interrupted");
+    lost_connection.store(true);
 }
 
 void Connection::write(const std::string& response) {

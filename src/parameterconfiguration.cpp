@@ -5,10 +5,10 @@
 using json = nlohmann::json;
 
 ParameterConfiguration::ParameterConfiguration()
-:steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {}
+: steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {}
 
 ParameterConfiguration::ParameterConfiguration(const json& j)
-:steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {
+: steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {
     steering_kp = *j["ParameterConfiguration"].find("steering_kp");
     steering_kd = *j["ParameterConfiguration"].find("steering_kd");
     speed_kp = *j["ParameterConfiguration"].find("speed_kp");
