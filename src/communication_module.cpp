@@ -110,6 +110,8 @@ void CommunicationModule::i2c_manager() {
             }
             delete vec;
         }
+        // Wait a while to increase stability
+        this_thread::sleep_for(chrono::milliseconds(10));
     }
 
     Logger::log(INFO, __FILE__, "COM", "Closing I2C manager");
