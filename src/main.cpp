@@ -50,7 +50,7 @@ int main() {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
             int16_t throttle = instruction.get_throttle();
             int16_t steering = instruction.get_steering();
-            com.send_manual_instruction(throttle, steering);
+            com.enqueue_manual_instruction(throttle, steering);
         } else if (connection.new_semi_instruction()) {
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
             stringstream ss{};

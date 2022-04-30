@@ -10,3 +10,6 @@
 [submodule "control-center"]
 	path = control-center
 	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/control-center.git
+[submodule "threaded-queue"]
+	path = threaded-queue
+	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/threaded-queue.git

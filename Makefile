@@ -7,7 +7,7 @@ CC_CPP = g++
 CC_C = gcc
 
 # Other include directories with headers
-INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src
+INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src -Ithreaded-queue/src
 INC += -isystem/usr/local/include/opencv4/
 
 # Compiling flags
@@ -27,7 +27,7 @@ MAINFILE := main.cpp
 # Name of output
 OUTNAME := main.out
 
-MAINOBJ := main.o   #$(patsubst %.cpp, %.o, $(MAINFILE))
+MAINOBJ := main.o
 CPP_SRCS := $(shell find $(SRC_DIR) -name '*.cpp' ! -name $(MAINFILE))
 C_SRCS := $(shell find $(SRC_DIR) -name '*.c')
 CPP_OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SRCS))

@@ -13,37 +13,47 @@ extern "C" {
 using namespace std;
 
 CommunicationModule::CommunicationModule(int fps)
-: cycle_time{1/fps}, start_time{chrono::high_resolution_clock::now()} {
+: cycle_time{1/fps}, start_time{chrono::high_resolution_clock::now()}, 
+  i2c_bus_running{true} {
     Logger::log(INFO, __FILE__, "COM", "Initiating communication module");
+    i2c_manager_thread = new thread(&CommunicationModule::i2c_manager, this);
 }
 
-void CommunicationModule::send_manual_instruction(uint16_t throttle, uint16_t steering) {
-    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
-    uint16_t buffer[] = {
-        STEERING_MANUAL_GAS, throttle,
-        STEERING_MANUAL_ANG, steering
+CommunicationModule::~CommunicationModule() {
+    i2c_bus_running.store(false);
+    i2c_manager_thread->join();
+    delete i2c_manager_thread;
+}
+
+void CommunicationModule::enqueue_manual_instruction(uint16_t throttle, int16_t steering) {
+    Logger::log(DEBUG, __FILE__, "COM", "Enqueueing manual instruction");
+    auto data = new vector<uint16_t>{
+        STEERING_MANUAL_GAS, package_signed(throttle),
+        STEERING_MANUAL_ANG, package_signed(steering)
     };
-    i2c_write(buffer, 4);
+    i2c_out_t packet{STEERING_MODULE_SLAVE_ADDRESS, data};
+    i2c_out_buffer.enqueue(packet);
 }
 
-void CommunicationModule::send_auto_instruction(
-        reference_t ref, int speed, int lat) {
-    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
-    uint16_t buffer[] = {
+void CommunicationModule::enqueue_auto_instruction(
+        reference_t ref, uint16_t speed, int16_t lat) {
+    Logger::log(DEBUG, __FILE__, "COM", "Enqueueing auto instruction");
+    auto data = new vector<uint16_t>{
         STEERING_CUR_VEL, package_signed(speed),
         STEERING_REF_VEL, package_signed(ref.speed),
         STEERING_CUR_ANG, package_signed(ref.angle),
         STEERING_CUR_LAT, package_signed(lat),
         STEERING_REGULATION_MODE, package_signed(ref.regulation_mode)
     };
-    i2c_write(buffer, sizeof(buffer)/sizeof(uint16_t));
+    i2c_out_t packet{STEERING_MODULE_SLAVE_ADDRESS, data};
+    i2c_out_buffer.enqueue(packet);
 }
 
-void CommunicationModule::send_regulation_constants(
+void CommunicationModule::enqueue_regulation_constants(
         int steeringKP, int steeringKD, int speedKP,
         int speedKI, int turnKP, int turnKD) {
-    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
-    uint16_t buffer[] = {
+    Logger::log(DEBUG, __FILE__, "COM", "Enqueueing regulation constants");
+    auto data = new vector<uint16_t>{
         STEERING_STEERING_KP, package_signed(steeringKP),
         STEERING_STEERING_KD, package_signed(steeringKD),
         STEERING_SPEED_KP, package_signed(speedKP),
@@ -51,7 +61,35 @@ void CommunicationModule::send_regulation_constants(
         STEERING_TURN_KP, package_signed(turnKP),
         STEERING_TURN_KD, package_signed(turnKD)
     };
-    i2c_write(buffer, sizeof(buffer)/sizeof(uint16_t));
+    i2c_out_t packet{STEERING_MODULE_SLAVE_ADDRESS, data};
+    i2c_out_buffer.enqueue(packet);
+}
+
+void CommunicationModule::i2c_manager() {
+    Logger::log(INFO, __FILE__, "COM", "I2C manager initiated");
+    while (i2c_bus_running.load()) {
+        // TODO get data
+
+        if (!i2c_out_buffer.empty()) {
+            i2c_out_t packet = i2c_out_buffer.dequeue();
+            i2c_set_slave_addr(packet.slave_address);
+
+            // This extracts the data as a pointer to the vector
+            vector<uint16_t> *vec = packet.data;
+            // This extracts a pointer to the first value, aka a C array
+            uint16_t *buffer = &((*vec)[0]);
+            i2c_write(buffer, vec->size());
+            delete vec;
+        }
+    }
+
+    Logger::log(INFO, __FILE__, "COM", "Closing I2C manager");
+
+    // Clear all remaining data
+    while (!i2c_out_buffer.empty()) {
+        i2c_out_t packet = i2c_out_buffer.dequeue();
+        delete packet.data;
+    }
 }
 
 int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
