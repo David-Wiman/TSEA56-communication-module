@@ -99,7 +99,7 @@ int i2c_read(uint16_t *message_names, uint16_t *messages) {
     return code;
 }
 
-void i2c_write(uint16_t *buffer, int len) {
+int i2c_write(uint16_t *buffer, int len) {
     i2c_log("I2C Write\n");
     // Convert buffer with 16 bit data to one with 8 bit data
     uint8_t buffer8[32];
@@ -123,5 +123,6 @@ void i2c_write(uint16_t *buffer, int len) {
             i2c_log("Error while writing on i2c bus (code -1)\n");
         }
     }
+    return writen_bytes;
 }
 

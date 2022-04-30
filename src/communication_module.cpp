@@ -78,7 +78,16 @@ void CommunicationModule::i2c_manager() {
             vector<uint16_t> *vec = packet.data;
             // This extracts a pointer to the first value, aka a C array
             uint16_t *buffer = &((*vec)[0]);
-            i2c_write(buffer, vec->size());
+            int len = i2c_write(buffer, vec->size());
+            if (len == -1) {
+                stringstream ss;
+                ss << "Failed to write to slave " << packet.slave_address;
+                Logger::log(ERROR, __FILE__, "COM", ss.str());
+            } else {
+                stringstream ss;
+                ss << "Wrote " << len << " bytes to slave " << packet.slave_address;
+                Logger::log(DEBUG, __FILE__, "COM", ss.str());
+            }
             delete vec;
         }
     }
