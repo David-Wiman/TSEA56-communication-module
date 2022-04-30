@@ -29,7 +29,7 @@ int main() {
     i2c_init();
     Connection connection{1234};
     ImageProcessing image_processor{"image-processing-module/", false};
-    CommunicationModule com{5};
+    CommunicationModule com{5, 100, 100};
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
@@ -42,9 +42,7 @@ int main() {
             break; // Kill car
         }
 
-        if (com.get_sensor_data(sensor_data)) {
-            // Error
-        }
+        com.update_sensor_data(sensor_data);
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();

@@ -17,28 +17,35 @@ typedef struct i2c_out_item {
 
 class CommunicationModule {
 public:
-    CommunicationModule(int fps);
+    CommunicationModule(int fps, double sensor_read_wait, double steering_read_wait);
     ~CommunicationModule();
 
     CommunicationModule(const CommunicationModule&) = delete;
     CommunicationModule operator=(const CommunicationModule&) = delete;
 
-    static int get_sensor_data(sensor_data_t &sensor_data);
+    void update_sensor_data(sensor_data_t &sensor_data);
     void enqueue_manual_instruction(uint16_t throttle, int16_t steering);
     void enqueue_auto_instruction(reference_t ref, uint16_t speed, int16_t lateral_position);
     void enqueue_regulation_constants(
             int steering_KP, int steeringKD,
             int speedKP, int speedKI,
             int turnKP, int turnKD);
-    void i2c_manager();
     void throttle();
 
 private:
+    void i2c_manager();
+    void read_sensor_data();
     int cycle_time;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+
     ThreadedQueue<i2c_out_t> i2c_out_buffer{};
     std::atomic<bool> i2c_bus_running;
     std::thread *i2c_manager_thread = nullptr;
+
+    double sensor_read_wait;
+    double steering_read_wait;
+    sensor_data_t sensor_data_buffer{};
+    std::mutex sensor_data_mtx{};
 };
 
 #endif  // COMMUNICATOIN_MODULE_H
