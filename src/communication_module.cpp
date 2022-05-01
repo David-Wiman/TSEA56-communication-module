@@ -136,6 +136,63 @@ int CommunicationModule::get_sensor_data(sensor_data_t &sensor_data) {
     return 0;
 }
 
+int CommunicationModule::get_steer_data(steer_data_t &steer_data) {
+    i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
+    uint16_t message_names[16];
+    uint16_t messages[16];
+    int len = i2c_read(message_names, messages);
+    if (len > 0) {
+        Logger::log(DEBUG, __FILE__, "I2C", "Read steer data");
+        uint16_t gas{0};
+        uint16_t steer_angle{0};
+	bool found_gas{false};
+	bool found_steer_angle{false};
+        for (int i=0; i<len; ++i) {
+            switch (message_names[i]) {
+                case STEERING_RETURN_GAS:
+                    steer_data.gas = messages[i];
+		    found_gas = true;
+                    break;
+                case STEERING_RETURN_ANG:
+                    steer_data.steer_angle = messages[i];
+		    found_steer_angle = true;
+                    break;
+                default:
+                    Logger::log(WARNING, __FILE__, "I2C", "Unexpected value read from steering module ");
+                    Logger::log(WARNING, __FILE__, "I2C", messages[i]);
+                    break;
+            }
+        }
+
+        // Check if data recieved
+        if (!found_gas) {
+            Logger::log(WARNING, __FILE__, "I2C", "No gas recieved");
+        }
+        if (!found_steer_angle) {
+            Logger::log(WARNING, __FILE__, "I2C", "No steer angle recieved");
+        }
+
+        // Log steer data
+        stringstream ss;
+        ss << "Steer data:"
+           << "\n\tgas: " << steer_data.gas
+           << "\n\tsteer_angle: " << steer_data.steer_angle;
+        Logger::log(DEBUG, __FILE__, "I2C", ss.str());
+
+        // TODO should this be 1 if missing some data?
+        return 0;
+    } else if (len == 0) {
+        Logger::log(WARNING, __FILE__, "I2C", "Steering module has no new data.");
+        return 1;
+    } else if (len == -2) {
+        Logger::log(ERROR, __FILE__, "I2C", "Failed to get message length from steering module");
+    } else {
+        Logger::log(ERROR, __FILE__, "I2C", "Can't read from steering module");
+        return -1;
+    }
+    return 0;
+}
+
 void CommunicationModule::throttle() {
     const auto now = chrono::high_resolution_clock::now();
     double t_delta = chrono::duration<double, std::milli>(now-start_time).count();
