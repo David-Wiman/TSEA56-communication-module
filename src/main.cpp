@@ -33,6 +33,7 @@ int main() {
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
+    steer_data_t steer_data{};
     image_proc_t image_data{};
 
     while (true) {
@@ -43,6 +44,10 @@ int main() {
         }
 
         if (com.get_sensor_data(sensor_data)) {
+            // Error
+        }
+
+        if (com.get_steer_data(steer_data)) {
             // Error
         }
 
