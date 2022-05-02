@@ -29,12 +29,17 @@ int main() {
     i2c_init();
     Connection connection{1234};
     ImageProcessing image_processor{"image-processing-module/", false};
-    CommunicationModule com{5, 100, 100};
+    CommunicationModule com{10, 100, 100};
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
     steer_data_t steer_data{};
     image_proc_t image_data{};
+    reference_t reference{};
+
+    drive_mode::DriveMode mode{drive_mode::manual};
+
+    com.enqueue_regulation_constants(0, 0, 2, 2, 0, 0);
 
     while (true) {
 
@@ -43,16 +48,21 @@ int main() {
             break; // Kill car
         }
 
+        if (connection.has_lost_connection()) {
+            Logger::log(ERROR, __FILE__, "Main", "Lost connection to user interface, exit.");
+            break;
+        }
+
         com.update_sensor_data(sensor_data);
 
-        com.update_steer_data(steer_data);
-
         if (connection.new_manual_instruction()) {
+            mode = drive_mode::manual;
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
             int16_t throttle = instruction.get_throttle();
             int16_t steering = instruction.get_steering();
             com.enqueue_manual_instruction(throttle, steering);
         } else if (connection.new_semi_instruction()) {
+            mode = drive_mode::semi_auto;
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
             stringstream ss{};
             ss << instruction;
@@ -63,20 +73,31 @@ int main() {
             //cout << "No new instruction" << endl;
         }
 
-        if (connection.has_lost_connection()) {
-            Logger::log(ERROR, __FILE__, "Main", "Lost connection to user interface, exit.");
-            break;
+        switch (mode) {
+            case drive_mode::manual:
+                com.update_steer_data(steer_data);
+                break;
+
+            case drive_mode::semi_auto:
+                {
+                    com.update_steer_data(steer_data);
+                    image_data = image_processor.process_next_frame();
+                    reference = control_center(sensor_data, image_data);
+                    com.enqueue_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
+                    string finished_instruction_id = control_center.get_finished_instruction_id();
+                    if (finished_instruction_id != "") {
+                        Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+                    }
+                }
+                break;
+
+            default:
+                Logger::log(ERROR, __FILE__, "Main", "Unexpected drive mode");
         }
 
-
-        image_data = image_processor.process_next_frame();
-
-        reference_t ref = control_center(sensor_data, image_data);
-        string finished_instruction_id = control_center.get_finished_instruction_id();
-        if (finished_instruction_id != "") {
-            Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
-        }
-        DriveData drivedata = DriveData(0, 0, 0, sensor_data, image_data.lateral_position, ref.angle);
+        DriveData drivedata = DriveData(
+                0, steer_data, sensor_data,
+                image_data.lateral_position, reference.angle);
         connection.write(drivedata.format_json());
 
         com.throttle();

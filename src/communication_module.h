@@ -10,6 +10,10 @@
 #ifndef COMMUNICATION_MODULE_H
 #define COMMUNICATION_MODULE_H
 
+namespace drive_mode {
+    enum DriveMode {manual, semi_auto, full_auto};
+}
+
 typedef struct i2c_out_item {
     uint8_t slave_address;
     std::vector<uint16_t> *data;

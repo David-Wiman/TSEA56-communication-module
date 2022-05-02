@@ -88,7 +88,7 @@ void CommunicationModule::i2c_manager() {
             read_sensor_data();
         } else if (since_steering_read >= steering_read_wait) {
             steering_read_time = chrono::high_resolution_clock::now();
-            // TODO
+            read_steer_data();
         } else if (!i2c_out_buffer.empty()) {
             // Write on the bus
 
@@ -106,7 +106,7 @@ void CommunicationModule::i2c_manager() {
                 Logger::log(ERROR, __FILE__, "COM", ss.str());
             } else {
                 stringstream ss;
-                ss << "Wrote " << len << " bytes to slave " << packet.slave_address;
+                ss << "Wrote " << len << " bytes to slave " << hex << packet.slave_address;
                 Logger::log(DEBUG, __FILE__, "COM", ss.str());
             }
             delete vec;
@@ -218,12 +218,12 @@ void CommunicationModule::read_steer_data() {
     i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
     uint16_t message_names[16];
     uint16_t messages[16];
+    Logger::log(DEBUG, __FILE__, "I2C", "Read steer data");
     int len = i2c_read(message_names, messages);
 
     lock_guard<mutex> lk(steer_data_mtx);
 
     if (len > 0) {
-        Logger::log(DEBUG, __FILE__, "I2C", "Read steer data");
         bool found_gas{false};
         bool found_steer_angle{false};
         for (int i=0; i<len; ++i) {

@@ -11,8 +11,8 @@ using json = nlohmann::json;
 
 class DriveData {
 public:
-    DriveData(int elasped_time, int throttle, int steering,
-              sensor_data_t sensor_data, int lateral_position, int angle);
+    DriveData(int elasped_time, steer_data_t const &steer_data,
+              sensor_data_t const &sensor_data, int lateral_position, int angle);
 
     std::string format_json();
 
