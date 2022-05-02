@@ -28,6 +28,7 @@ CommunicationModule::~CommunicationModule() {
 void CommunicationModule::enqueue_manual_instruction(uint16_t throttle, int16_t steering) {
     Logger::log(DEBUG, __FILE__, "COM", "Enqueueing manual instruction");
     auto data = new vector<uint16_t>{
+        STEERING_REGULATION_MODE, REGULATION_MODE_MANUAL,
         STEERING_MANUAL_GAS, package_signed(throttle),
         STEERING_MANUAL_ANG, package_signed(steering)
     };
