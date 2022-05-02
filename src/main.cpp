@@ -33,6 +33,7 @@ int main() {
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
+    steer_data_t steer_data{};
     image_proc_t image_data{};
 
     while (true) {
@@ -43,6 +44,8 @@ int main() {
         }
 
         com.update_sensor_data(sensor_data);
+
+        com.update_steer_data(steer_data);
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();

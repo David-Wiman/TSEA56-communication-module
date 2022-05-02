@@ -24,6 +24,7 @@ public:
     CommunicationModule operator=(const CommunicationModule&) = delete;
 
     void update_sensor_data(sensor_data_t &sensor_data);
+    void update_steer_data(steer_data_t &steer_data);
     void enqueue_manual_instruction(uint16_t throttle, int16_t steering);
     void enqueue_auto_instruction(reference_t ref, uint16_t speed, int16_t lateral_position);
     void enqueue_regulation_constants(
@@ -35,6 +36,7 @@ public:
 private:
     void i2c_manager();
     void read_sensor_data();
+    void read_steer_data();
     int cycle_time;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
 
@@ -46,6 +48,8 @@ private:
     double steering_read_wait;
     sensor_data_t sensor_data_buffer{};
     std::mutex sensor_data_mtx{};
+    steer_data_t steer_data_buffer{};
+    std::mutex steer_data_mtx{};
 };
 
 #endif  // COMMUNICATOIN_MODULE_H
