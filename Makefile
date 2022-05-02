@@ -23,7 +23,7 @@ CC_CPP = g++
 CC_C = gcc
 
 # Other include directories with headers
-INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src
+INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src -Ithreaded-queue/src
 INC += -isystem/usr/local/include/opencv4/
 
 # Compiling flags
@@ -96,9 +96,6 @@ $(SUBDIRS):
 
 # Compile everything except mainfile
 base: $(OBJ_DIR) $(CPP_OBJS) $(C_OBJS) Makefile
-	echo $(MAINFILE)
-	echo $(MAINOBJ)
-	echo $(AUTO_MAINOBJ)
 
 # Compile C++ objects
 $(CPP_OBJS) $(OBJ_DIR)/$(MAINOBJ): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
