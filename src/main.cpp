@@ -47,9 +47,15 @@ int main() {
             // Error
         }
 
+
+         this_thread::sleep_for(chrono::milliseconds(10));
+       
+
         if (com.get_steer_data(steer_data)) {
             // Error
         }
+        
+         this_thread::sleep_for(chrono::milliseconds(10));
 
         if (connection.new_manual_instruction()) {
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
