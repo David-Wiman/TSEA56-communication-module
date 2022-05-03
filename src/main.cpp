@@ -1,6 +1,8 @@
 #include "drivedata.h"
 #include "connection.h"
+#include "parameterconfiguration.h"
 #include "manualdriveinstruction.h"
+#include "semidriveinstruction.h"
 #include "drivedata.h"
 #include "log.h"
 #include "communication_module.h"
@@ -21,6 +23,7 @@ extern "C" {
 
 using namespace std;
 using json = nlohmann::json;
+using steady_clock = chrono::steady_clock;
 
 int main() {
 
@@ -28,6 +31,10 @@ int main() {
     Logger::init();
     i2c_init();
     Connection connection{1234};
+
+    // Connection recieved, start clock
+    steady_clock::time_point start_time = steady_clock::now();
+
     ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{10, 100, 100};
     ControlCenter control_center{};
@@ -40,6 +47,8 @@ int main() {
     drive_mode::DriveMode mode{drive_mode::manual};
 
     com.enqueue_regulation_constants(0, 0, 2, 2, 0, 0);
+
+    int elapsed_time{0};
 
     while (true) {
 
@@ -58,9 +67,9 @@ int main() {
         if (connection.new_manual_instruction()) {
             mode = drive_mode::manual;
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-            int16_t throttle = instruction.get_throttle();
-            int16_t steering = instruction.get_steering();
-            com.enqueue_manual_instruction(throttle, steering);
+            steer_data.gas = instruction.get_throttle();
+            steer_data.steer_angle = instruction.get_steering();
+            com.enqueue_manual_instruction(steer_data.gas, steer_data.steer_angle);
         } else if (connection.new_semi_instruction()) {
             mode = drive_mode::semi_auto;
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
@@ -87,6 +96,7 @@ int main() {
                     string finished_instruction_id = control_center.get_finished_instruction_id();
                     if (finished_instruction_id != "") {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+                        connection.send_instruction_id(finished_instruction_id);
                     }
                 }
                 break;
@@ -95,9 +105,14 @@ int main() {
                 Logger::log(ERROR, __FILE__, "Main", "Unexpected drive mode");
         }
 
+        // Calculate time in seconds since client connection (start)
+        auto time_diff = steady_clock::now() - start_time;
+        elapsed_time = chrono::duration_cast<chrono::milliseconds>(time_diff).count();
+
         DriveData drivedata = DriveData(
-                0, steer_data, sensor_data,
+                elapsed_time, steer_data, sensor_data,
                 image_data.lateral_position, reference.angle);
+
         connection.write(drivedata.format_json());
 
         com.throttle();

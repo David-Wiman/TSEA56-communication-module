@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <exception>
 
 #include "connection.h"
 #include "log.h"
@@ -10,13 +12,15 @@ using std::endl;
 
 /* Check if a given key exists in an json object */
 bool exists(const json& j, const std::string& key) {
+    // This will throw an uncatchable error if json is malformed
     return j.find(key) != j.end();
 }
 
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
-  socket{io_service}, emergency_stop{false}, manual_instruction{false}, semi_instruction{false},
-  auto_instruction{false}, lost_connection{false}, manual_drive_instruction{},
+  socket{io_service}, parameters{false}, manual_instruction{false},
+  semi_instruction{false}, auto_instruction{false}, emergency_stop{false},
+  lost_connection{false}, parameter_configuration{}, manual_drive_instruction{},
   semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
     acceptor.accept(socket);
     Logger::log(INFO, __FILE__, "Connection", "Connection established");
@@ -59,11 +63,17 @@ void Connection::read() {
             try {
                 j = json::parse(request);
             } catch (std::invalid_argument&) {
-                Logger::log(WARNING, __FILE__, "read", "Could not turn request into json object");
-                return;
+                Logger::log(ERROR, __FILE__, "read",
+                            "Could not turn request into json object");
+                continue;
+            } catch (std::exception& e) {
+                Logger::log(ERROR, __FILE__, "read",
+                            "Uncaught exception in json parsing");
+                Logger::log(DEBUG, __FILE__, "read", e.what());
+                break;
             }
 
-            // Check what kind of instruction and create instance of appropriate class
+            // Check what kind of response and create instance of appropriate class
             if (exists(j, "ManualDriveInstruction")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 manual_instruction.store(true);
@@ -79,18 +89,32 @@ void Connection::read() {
                 auto_instruction.store(true);
                 AutoDriveInstruction inst{j};
                 auto_drive_instruction = inst;
+            } else if (exists(j, "ParameterConfiguration")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                parameters.store(true);
+                ParameterConfiguration config{j};
+                parameter_configuration = config;
             }
         } catch (const boost::exception&) {
             Logger::log(ERROR, __FILE__, "read", "Connection lost");
-            lost_connection.store(true);
             break;
         }
     }
+
+    // Socket left loop, error has occured
+    Logger::log(ERROR, __FILE__, "read", "Socket read interrupted");
+    lost_connection.store(true);
 }
 
 void Connection::write(const std::string& response) {
     const std::string msg = response + "\n";
     boost::asio::write( socket, boost::asio::buffer(response));
+}
+
+void Connection::send_instruction_id(const std::string& id) {
+    std::ostringstream oss;
+    oss << "{\"InstructionId\": \"" << id << "\"}" ;
+    write(oss.str());
 }
 
 bool Connection::has_lost_connection() {
@@ -99,6 +123,10 @@ bool Connection::has_lost_connection() {
 
 bool Connection::emergency_recieved() {
     return emergency_stop.load();
+}
+
+bool Connection::new_parameters() {
+    return parameters.load();
 }
 
 bool Connection::new_manual_instruction() {
@@ -114,6 +142,16 @@ bool Connection::new_auto_instruction() {
 }
 
 /* Getters, sets new-values to false*/
+ParameterConfiguration Connection::get_parameter_configuration() {
+    std::lock_guard<std::mutex> lk(mtx);
+    parameters.store(false);
+    Logger::log(INFO, __FILE__, "Steering_kp", parameter_configuration.get_steering_kp());
+    Logger::log(INFO, __FILE__, "Steering_kd", parameter_configuration.get_steering_kd());
+    Logger::log(INFO, __FILE__, "Speed_kp", parameter_configuration.get_speed_kp());
+    Logger::log(INFO, __FILE__, "Speed_ki", parameter_configuration.get_speed_ki());
+    return parameter_configuration;
+}
+
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     manual_instruction.store(false);
@@ -125,6 +163,8 @@ ManualDriveInstruction Connection::get_manual_drive_instruction() {
 SemiDriveInstruction Connection::get_semi_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     semi_instruction.store(false);
+    Logger::log(INFO, __FILE__, "Direction", semi_drive_instruction.get_direction());
+    Logger::log(INFO, __FILE__, "Id", semi_drive_instruction.get_id());
     return semi_drive_instruction;
 }
 
