@@ -1,7 +1,9 @@
 # Installation
-install json library:
+install libraries:
 ```
+sudo apt update
 sudo apt install nlohmann-json3-dev
+sudo apt install libboost-all-dev
 ```
 
 Setup this repository:
