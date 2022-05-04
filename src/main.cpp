@@ -63,6 +63,7 @@ int main() {
             stringstream ss{};
             ss << params;
             Logger::log(INFO, __FILE__, "New regulation parameters", ss.str());
+            com.enqueue_regulation_constants(params);
         }
 
         com.update_sensor_data(sensor_data);
@@ -91,7 +92,6 @@ int main() {
 
             case drive_mode::semi_auto:
                 {
-                    cout << "SEMI" << endl;
                     com.update_steer_data(steer_data);
                     image_data = image_processor.process_next_frame();
                     reference = control_center(sensor_data, image_data);
