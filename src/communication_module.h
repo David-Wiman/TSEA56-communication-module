@@ -32,9 +32,10 @@ public:
     void enqueue_manual_instruction(uint16_t throttle, int16_t steering);
     void enqueue_auto_instruction(reference_t ref, uint16_t speed, int16_t lateral_position);
     void enqueue_regulation_constants(
-            int steering_KP, int steeringKD,
+            int steeringKP, int steeringKD,
             int speedKP, int speedKI,
             int turnKP, int turnKD);
+    void enqueue_regulation_constants(ParameterConfiguration const& params);
     void throttle();
 
 private:

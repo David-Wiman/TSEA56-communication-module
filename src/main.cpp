@@ -58,6 +58,13 @@ int main() {
             break;
         }
 
+        if (connection.new_parameters()) {
+            ParameterConfiguration params = connection.get_parameter_configuration();
+            stringstream ss{};
+            ss << params;
+            Logger::log(INFO, __FILE__, "New regulation parameters", ss.str());
+        }
+
         com.update_sensor_data(sensor_data);
 
         if (connection.new_manual_instruction()) {

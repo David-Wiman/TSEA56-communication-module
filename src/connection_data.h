@@ -62,10 +62,14 @@ public:
     ParameterConfiguration();
     ParameterConfiguration(const nlohmann::json& j);
 
-    int steering_kp;
-    int steering_kd;
-    int speed_kp;
-    int speed_ki;
+    int steering_kp{0};
+    int steering_kd{0};
+    int speed_kp{0};
+    int speed_ki{0};
+    int turn_kp{0};
+    int turn_kd{0};
 };
+
+std::ostream& operator<<(std::ostream &os, ParameterConfiguration const &param_config);
 
 #endif  // CONNECTION_DATA_H

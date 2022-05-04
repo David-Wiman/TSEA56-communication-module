@@ -145,10 +145,12 @@ bool Connection::new_auto_instruction() {
 ParameterConfiguration Connection::get_parameter_configuration() {
     std::lock_guard<std::mutex> lk(mtx);
     parameters.store(false);
-    Logger::log(INFO, __FILE__, "Steering_kp", parameter_configuration.steering_kp);
-    Logger::log(INFO, __FILE__, "Steering_kd", parameter_configuration.steering_kd);
-    Logger::log(INFO, __FILE__, "Speed_kp", parameter_configuration.speed_kp);
-    Logger::log(INFO, __FILE__, "Speed_ki", parameter_configuration.speed_ki);
+    Logger::log(DEBUG, __FILE__, "Steering_kp", parameter_configuration.steering_kp);
+    Logger::log(DEBUG, __FILE__, "Steering_kd", parameter_configuration.steering_kd);
+    Logger::log(DEBUG, __FILE__, "Speed_kp", parameter_configuration.speed_kp);
+    Logger::log(DEBUG, __FILE__, "Speed_ki", parameter_configuration.speed_ki);
+    Logger::log(DEBUG, __FILE__, "Turn_kp", parameter_configuration.turn_kp);
+    Logger::log(DEBUG, __FILE__, "Turn_kd", parameter_configuration.turn_kd);
     return parameter_configuration;
 }
 

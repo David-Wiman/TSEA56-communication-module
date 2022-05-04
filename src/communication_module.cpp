@@ -66,6 +66,13 @@ void CommunicationModule::enqueue_regulation_constants(
     i2c_out_buffer.enqueue(packet);
 }
 
+void CommunicationModule::enqueue_regulation_constants(ParameterConfiguration const& params) {
+    enqueue_regulation_constants(
+            params.steering_kp, params.steering_kd,
+            params.speed_kp, params.speed_ki,
+            params.turn_kp, params.turn_kd);
+}
+
 void CommunicationModule::i2c_manager() {
     Logger::log(INFO, __FILE__, "I2C", "I2C manager initiated");
 

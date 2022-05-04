@@ -75,5 +75,18 @@ ParameterConfiguration::ParameterConfiguration(const json& j)
     steering_kd = *j["ParameterConfiguration"].find("steering_kd");
     speed_kp = *j["ParameterConfiguration"].find("speed_kp");
     speed_ki = *j["ParameterConfiguration"].find("speed_ki");
+    turn_kp = *j["ParameterConfiguration"].find("turn_kp");
+    turn_kd = *j["ParameterConfiguration"].find("turn_kd");
+}
+
+
+std::ostream& operator<<(std::ostream &os, ParameterConfiguration const &param_config) {
+    os << "steering_kp=" << param_config.steering_kp
+       << " steering_kd=" << param_config.steering_kd
+       << " speed_kp=" << param_config.speed_kp
+       << " speed_ki=" << param_config.speed_ki
+       << " turn_kp=" << param_config.turn_kp
+       << " turn_kd=" << param_config.turn_kd;
+    return os;
 }
 
