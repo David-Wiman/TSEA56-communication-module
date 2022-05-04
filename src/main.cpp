@@ -1,9 +1,5 @@
-#include "drivedata.h"
 #include "connection.h"
-#include "parameterconfiguration.h"
-#include "manualdriveinstruction.h"
-#include "semidriveinstruction.h"
-#include "drivedata.h"
+#include "connection_data.h"
 #include "log.h"
 #include "communication_module.h"
 #include "image_processing.h"
@@ -67,8 +63,7 @@ int main() {
         if (connection.new_manual_instruction()) {
             mode = drive_mode::manual;
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
-            steer_data.gas = instruction.get_throttle();
-            steer_data.steer_angle = instruction.get_steering();
+            steer_data = instruction.as_steer_data();
             com.enqueue_manual_instruction(steer_data.gas, steer_data.steer_angle);
         } else if (connection.new_semi_instruction()) {
             mode = drive_mode::semi_auto;
@@ -77,7 +72,7 @@ int main() {
             ss << instruction;
             Logger::log(INFO, __FILE__, "New (semi-auto) instruction", ss.str());
 
-            control_center.add_drive_instruction(instruction.get_drive_instruction());
+            control_center.add_drive_instruction(instruction.as_drive_instruction());
         } else {
             //cout << "No new instruction" << endl;
         }
@@ -89,6 +84,7 @@ int main() {
 
             case drive_mode::semi_auto:
                 {
+                    cout << "SEMI" << endl;
                     com.update_steer_data(steer_data);
                     image_data = image_processor.process_next_frame();
                     reference = control_center(sensor_data, image_data);

@@ -145,26 +145,26 @@ bool Connection::new_auto_instruction() {
 ParameterConfiguration Connection::get_parameter_configuration() {
     std::lock_guard<std::mutex> lk(mtx);
     parameters.store(false);
-    Logger::log(INFO, __FILE__, "Steering_kp", parameter_configuration.get_steering_kp());
-    Logger::log(INFO, __FILE__, "Steering_kd", parameter_configuration.get_steering_kd());
-    Logger::log(INFO, __FILE__, "Speed_kp", parameter_configuration.get_speed_kp());
-    Logger::log(INFO, __FILE__, "Speed_ki", parameter_configuration.get_speed_ki());
+    Logger::log(INFO, __FILE__, "Steering_kp", parameter_configuration.steering_kp);
+    Logger::log(INFO, __FILE__, "Steering_kd", parameter_configuration.steering_kd);
+    Logger::log(INFO, __FILE__, "Speed_kp", parameter_configuration.speed_kp);
+    Logger::log(INFO, __FILE__, "Speed_ki", parameter_configuration.speed_ki);
     return parameter_configuration;
 }
 
 ManualDriveInstruction Connection::get_manual_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     manual_instruction.store(false);
-    Logger::log(INFO, __FILE__, "Throttle", manual_drive_instruction.get_throttle());
-    Logger::log(INFO, __FILE__, "Steering", manual_drive_instruction.get_steering());
+    Logger::log(INFO, __FILE__, "Throttle", manual_drive_instruction.throttle);
+    Logger::log(INFO, __FILE__, "Steering", manual_drive_instruction.steering);
     return manual_drive_instruction;
 }
 
 SemiDriveInstruction Connection::get_semi_drive_instruction() {
     std::lock_guard<std::mutex> lk(mtx);
     semi_instruction.store(false);
-    Logger::log(INFO, __FILE__, "Direction", semi_drive_instruction.get_direction());
-    Logger::log(INFO, __FILE__, "Id", semi_drive_instruction.get_id());
+    Logger::log(INFO, __FILE__, "Direction", semi_drive_instruction.direction);
+    Logger::log(INFO, __FILE__, "Id", semi_drive_instruction.id);
     return semi_drive_instruction;
 }
 

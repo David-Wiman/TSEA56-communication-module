@@ -7,10 +7,7 @@
 #include <atomic>
 
 #include "raspi_common.h"
-#include "parameterconfiguration.h"
-#include "manualdriveinstruction.h"
-#include "semidriveinstruction.h"
-#include "autodriveinstruction.h"
+#include "connection_data.h"
 
 using json = nlohmann::json;
 

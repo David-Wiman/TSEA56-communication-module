@@ -3,7 +3,7 @@
 #include <thread>
 #include <atomic>
 
-#include "drivedata.h"
+#include "connection_data.h"
 #include "raspi_common.h"
 #include "threaded_queue.h"
 
