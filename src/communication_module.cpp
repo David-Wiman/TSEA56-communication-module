@@ -13,9 +13,12 @@ extern "C" {
 using namespace std;
 
 CommunicationModule::CommunicationModule(int fps, double sensor_read_wait, double steering_read_wait)
-: cycle_time{1/fps}, start_time{chrono::high_resolution_clock::now()},
+: cycle_time{1000/fps}, start_time{chrono::high_resolution_clock::now()},
   i2c_bus_running{true}, sensor_read_wait{sensor_read_wait}, steering_read_wait{steering_read_wait} {
     Logger::log(INFO, __FILE__, "COM", "Initiating communication module");
+    stringstream ss{};
+    ss << "Throttle set to " << cycle_time << " ms";
+    Logger::log(INFO, __FILE__, "COM", ss.str());
     i2c_manager_thread = new thread(&CommunicationModule::i2c_manager, this);
 }
 
@@ -278,7 +281,6 @@ void CommunicationModule::read_steer_data() {
 void CommunicationModule::throttle() {
     const auto now = chrono::high_resolution_clock::now();
     double t_delta = chrono::duration<double, std::milli>(now-start_time).count();
-    double cycle_time{200};
     stringstream ss{};
     ss << "Program cycle took " << t_delta << " ms";
     Logger::log(DEBUG, __FILE__, "COM", ss.str());
