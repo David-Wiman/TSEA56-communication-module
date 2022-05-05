@@ -32,7 +32,7 @@ int main() {
     steady_clock::time_point start_time = steady_clock::now();
 
     ImageProcessing image_processor{"image-processing-module/", false};
-    CommunicationModule com{10, 100, 100};
+    CommunicationModule com{10};
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
@@ -42,7 +42,7 @@ int main() {
 
     drive_mode::DriveMode mode{drive_mode::manual};
 
-    com.enqueue_regulation_constants(0, 0, 2, 2, 0, 0);
+    com.write_regulation_constants(0, 0, 2, 2, 0, 0);
 
     int elapsed_time{0};
 
@@ -63,16 +63,16 @@ int main() {
             stringstream ss{};
             ss << params;
             Logger::log(INFO, __FILE__, "New regulation parameters", ss.str());
-            com.enqueue_regulation_constants(params);
+            com.write_regulation_constants(params);
         }
 
-        com.update_sensor_data(sensor_data);
+        com.read_sensor_data(sensor_data);
 
         if (connection.new_manual_instruction()) {
             mode = drive_mode::manual;
             ManualDriveInstruction instruction = connection.get_manual_drive_instruction();
             steer_data = instruction.as_steer_data();
-            com.enqueue_manual_instruction(steer_data.gas, steer_data.steer_angle);
+            com.write_manual_instruction(steer_data.gas, steer_data.steer_angle);
         } else if (connection.new_semi_instruction()) {
             mode = drive_mode::semi_auto;
             SemiDriveInstruction instruction = connection.get_semi_drive_instruction();
@@ -87,15 +87,15 @@ int main() {
 
         switch (mode) {
             case drive_mode::manual:
-                com.update_steer_data(steer_data);
+                com.read_steer_data(steer_data);
                 break;
 
             case drive_mode::semi_auto:
                 {
-                    com.update_steer_data(steer_data);
+                    com.read_steer_data(steer_data);
                     image_data = image_processor.process_next_frame();
                     reference = control_center(sensor_data, image_data);
-                    com.enqueue_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
+                    com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
                     string finished_instruction_id = control_center.get_finished_instruction_id();
                     if (finished_instruction_id != "") {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);

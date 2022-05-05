@@ -23,7 +23,7 @@ CC_CPP = g++
 CC_C = gcc
 
 # Other include directories with headers
-INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src -Ithreaded-queue/src
+INC := -isystemcommon -isystemlogger/src -isystemimage-processing-module/src
 INC += -isystem/usr/local/include/opencv4/
 
 # Compiling flags
