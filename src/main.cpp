@@ -32,7 +32,7 @@ int main() {
     steady_clock::time_point start_time = steady_clock::now();
 
     ImageProcessing image_processor{"image-processing-module/", false};
-    CommunicationModule com{10};
+    CommunicationModule com{20};
     ControlCenter control_center{};
 
     sensor_data_t sensor_data{};
