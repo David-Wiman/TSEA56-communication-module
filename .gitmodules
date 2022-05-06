@@ -10,3 +10,6 @@
 [submodule "control-center"]
 	path = control-center
 	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/control-center.git
+[submodule "thread-safe"]
+	path = thread-safe
+	url = git@gitlab.liu.se:da-proj/TSEA56/2022/G08/thread-safe.git
