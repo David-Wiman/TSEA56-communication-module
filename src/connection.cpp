@@ -108,7 +108,7 @@ void Connection::read() {
 
 void Connection::write(const std::string& response) {
     const std::string msg = response + "\n";
-    boost::asio::write( socket, boost::asio::buffer(response));
+    boost::asio::write( socket, boost::asio::buffer(msg));
 }
 
 void Connection::send_instruction_id(const std::string& id) {
