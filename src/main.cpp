@@ -24,7 +24,7 @@ using steady_clock = chrono::steady_clock;
 int main() {
 
     // Initiate
-    Logger::init();
+    Logger::init(true);
     i2c_init();
     Connection connection{1234};
 
@@ -42,7 +42,7 @@ int main() {
 
     drive_mode::DriveMode mode{drive_mode::manual};
 
-    com.write_regulation_constants(0, 0, 2, 2, 0, 0);
+    com.write_regulation_constants(100, 100, 2, 2, 0, 100);
 
     int elapsed_time{0};
 
