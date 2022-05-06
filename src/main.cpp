@@ -118,7 +118,7 @@ int main() {
 
         connection.write(drivedata.format_json());
 
-        com.throttle();
+        com.throttle(false);
     }
 
     return 0;

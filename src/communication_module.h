@@ -34,7 +34,7 @@ public:
             int speedKP, int speedKI,
             int turnKP, int turnKD);
     void write_regulation_constants(ParameterConfiguration const& params);
-    void throttle();
+    void throttle(bool do_thottle=true);
 
 private:
     int cycle_time;

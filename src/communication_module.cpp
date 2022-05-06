@@ -214,14 +214,14 @@ void CommunicationModule::read_steer_data(steer_data_t &steer_data) {
     }
 }
 
-void CommunicationModule::throttle() {
+void CommunicationModule::throttle(bool do_throttle) {
     const auto now = chrono::high_resolution_clock::now();
     double t_delta = chrono::duration<double, std::milli>(now-start_time).count();
     stringstream ss{};
     ss << "Program cycle took " << t_delta << " ms";
     Logger::log(DEBUG, __FILE__, "COM", ss.str());
     ss.str("");
-    if (t_delta < cycle_time) {
+    if (do_throttle && (t_delta < cycle_time)) {
         ss << "Sleeping for " << cycle_time - t_delta << " ms";
         Logger::log(DEBUG, __FILE__, "COM", ss.str());
         int ms = static_cast<int>(cycle_time - t_delta);
