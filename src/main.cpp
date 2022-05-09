@@ -81,8 +81,12 @@ int main() {
             Logger::log(INFO, __FILE__, "New (semi-auto) instruction", ss.str());
 
             control_center.add_drive_instruction(instruction.as_drive_instruction());
+        } else if (connection.new_auto_instruction()) {
+            mode = drive_mode::full_auto;
+            AutoDriveInstruction instruction = connection.get_auto_drive_instruction();
+            Logger::log(INFO, __FILE__, "New (full-auto) instruction", "NaN");
         } else {
-            //cout << "No new instruction" << endl;
+            // No new instruction
         }
 
         switch (mode) {

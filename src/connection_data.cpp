@@ -41,7 +41,9 @@ ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruct
 }
 
 AutoDriveInstruction::AutoDriveInstruction(const json& j) {
-    target_nodes = *j.find("AutoDriveInstruction");
+    for(auto& node : j["AutoDriveInstruction"]) {
+        target_nodes.push_back(node);
+    }
 }
 
 list<string> AutoDriveInstruction::get_target_nodes() {

@@ -4,6 +4,7 @@
 #include "raspi_common.h"
 
 #include <string>
+#include <list>
 #include <sstream>
 #include <nlohmann/json.hpp>
 
@@ -35,12 +36,12 @@ std::ostream& operator<<(std::ostream &os, SemiDriveInstruction const &semi_driv
 
 class AutoDriveInstruction {
 public:
-    AutoDriveInstruction();
+    AutoDriveInstruction() {};
     AutoDriveInstruction(const nlohmann::json& j);
-    std::list<std::string> get_target_nodes();
 
-private:
-    std::list<std::string> target_nodes{};
+    std::list<std::string> get_target_nodes();
+    
+    std::list<std::string> target_nodes{};    
 };
 
 class DriveData {
