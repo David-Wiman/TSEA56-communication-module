@@ -40,8 +40,13 @@ ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruct
     return os;
 }
 
+AutoDriveInstruction::AutoDriveInstruction(const json& j) {
+    target_nodes = *j.find("AutoDriveInstruction");
+}
 
-AutoDriveInstruction::AutoDriveInstruction(const json& j) {}
+list<string> AutoDriveInstruction::get_target_nodes() {
+    return target_nodes;
+}
 
 
 DriveData::DriveData(int elasped_time, steer_data_t const &steer_data,
