@@ -32,7 +32,7 @@ int main() {
     steady_clock::time_point start_time = steady_clock::now();
 
     ImageProcessing image_processor{"image-processing-module/", false};
-    CommunicationModule com{20};
+    CommunicationModule com{};
     ControlCenter control_center{3, 3};
 
     sensor_data_t sensor_data{};
@@ -118,7 +118,7 @@ int main() {
 
         connection.write(drivedata.format_json());
 
-        com.throttle(false);
+        com.throttle(100);
     }
 
     return 0;

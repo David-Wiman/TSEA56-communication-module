@@ -12,12 +12,9 @@ extern "C" {
 
 using namespace std;
 
-CommunicationModule::CommunicationModule(int fps)
-: cycle_time{1000/fps}, start_time{chrono::high_resolution_clock::now()} {
+CommunicationModule::CommunicationModule()
+: start_time{chrono::high_resolution_clock::now()} {
     Logger::log(INFO, __FILE__, "COM", "Initiating communication module");
-    stringstream ss{};
-    ss << "Throttle set to " << cycle_time << " ms";
-    Logger::log(INFO, __FILE__, "COM", ss.str());
 }
 
 void CommunicationModule::write_manual_instruction(uint16_t throttle, int16_t steering) {
@@ -214,20 +211,24 @@ void CommunicationModule::read_steer_data(steer_data_t &steer_data) {
     }
 }
 
-void CommunicationModule::throttle(bool do_throttle) {
+void CommunicationModule::throttle(unsigned max_fps) {
+    int max_cycle_time{};
+    if (max_fps > 0)
+        max_cycle_time = 1000/max_fps;
+
     const auto now = chrono::high_resolution_clock::now();
     double t_delta = chrono::duration<double, std::milli>(now-start_time).count();
     stringstream ss{};
     ss << "Program cycle took " << t_delta << " ms";
     Logger::log(DEBUG, __FILE__, "COM", ss.str());
     ss.str("");
-    if (do_throttle && (t_delta < cycle_time)) {
-        ss << "Sleeping for " << cycle_time - t_delta << " ms";
+    if (max_fps && (t_delta < max_cycle_time)) {
+        ss << "Sleeping for " << max_cycle_time - t_delta << " ms";
         Logger::log(DEBUG, __FILE__, "COM", ss.str());
-        int ms = static_cast<int>(cycle_time - t_delta);
+        int ms = static_cast<int>(max_cycle_time - t_delta);
         this_thread::sleep_for(chrono::milliseconds(ms));
     } else {
-        Logger::log(WARNING, __FILE__, "COM", "Program cycle time exceeded");
+        Logger::log(INFO, __FILE__, "COM", "Not throtteling");
     }
     start_time = chrono::high_resolution_clock::now();
 }

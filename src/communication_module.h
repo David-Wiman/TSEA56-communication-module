@@ -20,7 +20,7 @@ typedef struct i2c_out_item {
 
 class CommunicationModule {
 public:
-    CommunicationModule(int fps);
+    CommunicationModule();
 
     CommunicationModule(const CommunicationModule&) = delete;
     CommunicationModule operator=(const CommunicationModule&) = delete;
@@ -34,10 +34,9 @@ public:
             int speedKP, int speedKI,
             int turnKP, int turnKD);
     void write_regulation_constants(ParameterConfiguration const& params);
-    void throttle(bool do_thottle=true);
+    void throttle(unsigned max_fps);
 
 private:
-    int cycle_time;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
 };
 
