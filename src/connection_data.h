@@ -34,10 +34,10 @@ public:
 
 std::ostream& operator<<(std::ostream &os, SemiDriveInstruction const &semi_drive_instruction);
 
-class AutoDriveInstruction {
+class DriveMission {
 public:
-    AutoDriveInstruction() {};
-    AutoDriveInstruction(const nlohmann::json& j);
+    DriveMission() {};
+    DriveMission(const nlohmann::json& j);
 
     std::list<std::string> get_target_nodes();
     

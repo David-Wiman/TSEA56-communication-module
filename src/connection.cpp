@@ -21,7 +21,7 @@ Connection::Connection(int port)
   socket{io_service}, parameters{false}, manual_instruction{false},
   semi_instruction{false}, auto_instruction{false}, emergency_stop{false},
   lost_connection{false}, parameter_configuration{}, manual_drive_instruction{},
-  semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
+  semi_drive_instruction{}, drive_mission{}, thread{}, mtx{} {
     acceptor.accept(socket);
     Logger::log(INFO, __FILE__, "Connection", "Connection established");
     thread = new std::thread(&Connection::read, this);
@@ -84,11 +84,11 @@ void Connection::read() {
                 semi_instruction.store(true);
                 SemiDriveInstruction inst{j};
                 semi_drive_instruction = inst;
-            } else if (exists(j, "AutoDriveInstruction")) {
+            } else if (exists(j, "DriveMission")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 auto_instruction.store(true);
-                AutoDriveInstruction inst{j};
-                auto_drive_instruction = inst;
+                DriveMission inst{j};
+                drive_mission = inst;
             } else if (exists(j, "ParameterConfiguration")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 parameters.store(true);
@@ -173,8 +173,8 @@ SemiDriveInstruction Connection::get_semi_drive_instruction() {
     return semi_drive_instruction;
 }
 
-AutoDriveInstruction Connection::get_auto_drive_instruction() {
+DriveMission Connection::get_drive_mission() {
     std::lock_guard<std::mutex> lk(mtx);
     auto_instruction.store(false);
-    return auto_drive_instruction;
+    return drive_mission;
 }

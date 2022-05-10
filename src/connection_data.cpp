@@ -40,13 +40,13 @@ ostream& operator<<(ostream &os, SemiDriveInstruction const &semi_drive_instruct
     return os;
 }
 
-AutoDriveInstruction::AutoDriveInstruction(const json& j) {
-    for(auto& node : j["AutoDriveInstruction"]) {
+DriveMission::DriveMission(const json& j) {
+    for(auto& node : j["DriveMission"]) {
         target_nodes.push_back(node);
     }
 }
 
-list<string> AutoDriveInstruction::get_target_nodes() {
+list<string> DriveMission::get_target_nodes() {
     return target_nodes;
 }
 

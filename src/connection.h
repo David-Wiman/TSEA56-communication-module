@@ -57,8 +57,8 @@ public:
     /* Returns latest SemiDriveInstruction recieved and resets new_semi_instruction */
     SemiDriveInstruction get_semi_drive_instruction();
 
-    /* Returns latest AutoDriveInstruction recieved and resets new_auto_instruction */
-    AutoDriveInstruction get_auto_drive_instruction();
+    /* Returns latest DriveMission recieved and resets new_auto_instruction */
+    DriveMission get_drive_mission();
 
 private:
     void read();
@@ -83,7 +83,7 @@ private:
     ParameterConfiguration parameter_configuration;
     ManualDriveInstruction manual_drive_instruction;
     SemiDriveInstruction semi_drive_instruction;
-    AutoDriveInstruction auto_drive_instruction;
+    DriveMission drive_mission;
 
     /* Threading */
     std::thread *thread;
