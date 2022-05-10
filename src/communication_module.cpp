@@ -228,7 +228,7 @@ void CommunicationModule::throttle(unsigned max_fps) {
         int ms = static_cast<int>(max_cycle_time - t_delta);
         this_thread::sleep_for(chrono::milliseconds(ms));
     } else {
-        Logger::log(INFO, __FILE__, "COM", "Not throtteling");
+        Logger::log(DEBUG, __FILE__, "COM", "Not throtteling");
     }
     start_time = chrono::high_resolution_clock::now();
 }
