@@ -107,6 +107,12 @@ int main() {
                     }
                 }
                 break;
+            
+            case drive_mode::full_auto:
+                {
+
+                }
+                break;
 
             default:
                 Logger::log(ERROR, __FILE__, "Main", "Unexpected drive mode");
