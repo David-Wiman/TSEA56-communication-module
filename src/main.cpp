@@ -33,7 +33,7 @@ int main() {
 
     ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{};
-    ControlCenter control_center{3, 3};
+    ControlCenter control_center{3, 3, 5, 2};
 
     sensor_data_t sensor_data{};
     steer_data_t steer_data{};
@@ -92,10 +92,9 @@ int main() {
 
             case drive_mode::semi_auto:
                 {
-                    com.read_steer_data(steer_data);
                     image_data = image_processor.get_next_image_data();
                     reference = control_center(sensor_data, image_data);
-                    com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
+                    com.write_auto_instruction(reference, min(sensor_data.speed, 700), image_data.lateral_position);
                     string finished_instruction_id = control_center.get_finished_instruction_id();
                     if (finished_instruction_id != "") {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);

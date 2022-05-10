@@ -85,10 +85,12 @@ void CommunicationModule::read_sensor_data(sensor_data_t &sensor_data) {
     i2c_set_slave_addr(SENSOR_MODULE_SLAVE_ADDRESS);
     uint16_t message_names[16];
     uint16_t messages[16];
+    this_thread::sleep_for(chrono::milliseconds(5));
     Logger::log(DEBUG, __FILE__, "I2C", "Read sensor data");
     int len = i2c_read(message_names, messages);
 
     if (len > 0) {
+        this_thread::sleep_for(chrono::milliseconds(5));
         uint16_t left_driving_distance{0};
         uint16_t right_driving_distance{0};
         uint16_t left_speed{MAX_INT};

@@ -1,6 +1,9 @@
 build
 *.out
-log/log*
+log/*
 .vscode
 log/i2c_log.txt
 *.swp
+canny.jpg
+out.jpg
+
