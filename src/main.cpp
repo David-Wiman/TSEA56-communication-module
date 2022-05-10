@@ -83,7 +83,7 @@ int main() {
             control_center.add_drive_instruction(instruction.as_drive_instruction());
         } else if (connection.new_auto_instruction()) {
             mode = drive_mode::full_auto;
-            AutoDriveInstruction instruction = connection.get_auto_drive_instruction();
+            DriveMission instruction = connection.get_drive_mission();
             Logger::log(INFO, __FILE__, "New (full-auto) instruction", "NaN");
         } else {
             // No new instruction
