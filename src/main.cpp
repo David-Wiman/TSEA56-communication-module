@@ -85,6 +85,10 @@ int main() {
             mode = drive_mode::full_auto;
             DriveMission instruction = connection.get_drive_mission();
             Logger::log(INFO, __FILE__, "New (full-auto) instruction", "NaN");
+        } else if (connection.new_map()) {
+            json mapdata = connection.get_map();
+            control_center.update_map(mapdata);
+            Logger::log(INFO, __FILE__, "New map recieved", mapdata.dump());
         } else {
             // No new instruction
         }

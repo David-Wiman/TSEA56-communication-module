@@ -72,7 +72,6 @@ std::string DriveData::format_json() {
     return oss.str();
 }
 
-
 ParameterConfiguration::ParameterConfiguration()
 : steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {}
 
