@@ -41,6 +41,7 @@ public:
 
     std::list<std::string> get_target_nodes();
     
+private:
     std::list<std::string> target_nodes{};    
 };
 
