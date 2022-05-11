@@ -79,12 +79,12 @@ int main() {
             stringstream ss{};
             ss << instruction;
             Logger::log(INFO, __FILE__, "New (semi-auto) instruction", ss.str());
-
             control_center.add_drive_instruction(instruction.as_drive_instruction());
         } else if (connection.new_auto_instruction()) {
             mode = drive_mode::full_auto;
             DriveMission instruction = connection.get_drive_mission();
-            Logger::log(INFO, __FILE__, "New (full-auto) instruction", "NaN");
+            control_center.update_list_of_target_nodes(instruction.get_target_nodes());
+            Logger::log(INFO, __FILE__, "New (full-auto) instruction", "");
         } else if (connection.new_map()) {
             json mapdata = connection.get_map();
             control_center.update_map(mapdata);

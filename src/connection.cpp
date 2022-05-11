@@ -89,8 +89,7 @@ void Connection::read() {
                 std::lock_guard<std::mutex> lk(mtx);
                 auto_instruction.store(true);
                 DriveMission inst{j};
-                drive_mission = inst;
-                cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDriveMission\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << endl;
+                drive_mission = inst;                
             } else if (exists(j, "ParameterConfiguration")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 parameters.store(true);
