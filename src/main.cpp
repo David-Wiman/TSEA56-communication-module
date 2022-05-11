@@ -42,7 +42,7 @@ int main() {
 
     drive_mode::DriveMode mode{drive_mode::manual};
 
-    com.write_regulation_constants(100, 100, 2, 2, 0, 100);
+    com.write_regulation_constants(100, 150, 2, 2, 150, 1610);
 
     int elapsed_time{0};
 

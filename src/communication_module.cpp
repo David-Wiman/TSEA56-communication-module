@@ -55,15 +55,15 @@ void CommunicationModule::write_auto_instruction(
 
 void CommunicationModule::write_regulation_constants(
         int steeringKP, int steeringKD, int speedKP,
-        int speedKI, int turnKP, int turnKD) {
+        int speedKI, int turnKD, int angleOffset) {
     Logger::log(DEBUG, __FILE__, "COM", "Writing regulation constants");
     uint16_t data[] = {
         STEERING_STEERING_KP, package_signed(steeringKP),
         STEERING_STEERING_KD, package_signed(steeringKD),
         STEERING_SPEED_KP, package_signed(speedKP),
         STEERING_SPEED_KI, package_signed(speedKI),
-        STEERING_TURN_KP, package_signed(turnKP),
-        STEERING_TURN_KD, package_signed(turnKD)
+        STEERING_TURN_KD, package_signed(turnKD),
+        STEERING_ANGLE_OFFSET, package_signed(angleOffset)
     };
     i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
     int len = i2c_write(data, sizeof(data)/sizeof(uint16_t));
@@ -78,7 +78,7 @@ void CommunicationModule::write_regulation_constants(ParameterConfiguration cons
     write_regulation_constants(
             params.steering_kp, params.steering_kd,
             params.speed_kp, params.speed_ki,
-            params.turn_kp, params.turn_kd);
+            params.turn_kd, params.angle_offset);
 }
 
 void CommunicationModule::read_sensor_data(sensor_data_t &sensor_data) {

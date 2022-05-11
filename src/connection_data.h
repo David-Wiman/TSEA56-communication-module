@@ -66,7 +66,7 @@ public:
     int steering_kd{0};
     int speed_kp{0};
     int speed_ki{0};
-    int turn_kp{0};
+    int angle_offset{0};
     int turn_kd{0};
 };
 

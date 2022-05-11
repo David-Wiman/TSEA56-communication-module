@@ -66,16 +66,14 @@ std::string DriveData::format_json() {
 }
 
 
-ParameterConfiguration::ParameterConfiguration()
-: steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {}
+ParameterConfiguration::ParameterConfiguration() {}
 
-ParameterConfiguration::ParameterConfiguration(const json& j)
-: steering_kp{0}, steering_kd{0}, speed_kp{0}, speed_ki{0} {
+ParameterConfiguration::ParameterConfiguration(const json& j) {
     steering_kp = *j["ParameterConfiguration"].find("steering_kp");
     steering_kd = *j["ParameterConfiguration"].find("steering_kd");
     speed_kp = *j["ParameterConfiguration"].find("speed_kp");
     speed_ki = *j["ParameterConfiguration"].find("speed_ki");
-    turn_kp = *j["ParameterConfiguration"].find("turn_kp");
+    angle_offset = *j["ParameterConfiguration"].find("angle_offset");
     turn_kd = *j["ParameterConfiguration"].find("turn_kd");
 }
 
@@ -85,7 +83,7 @@ std::ostream& operator<<(std::ostream &os, ParameterConfiguration const &param_c
        << " steering_kd=" << param_config.steering_kd
        << " speed_kp=" << param_config.speed_kp
        << " speed_ki=" << param_config.speed_ki
-       << " turn_kp=" << param_config.turn_kp
+       << " angle_offset=" << param_config.angle_offset
        << " turn_kd=" << param_config.turn_kd;
     return os;
 }

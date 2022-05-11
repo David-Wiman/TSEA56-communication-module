@@ -149,8 +149,8 @@ ParameterConfiguration Connection::get_parameter_configuration() {
     Logger::log(DEBUG, __FILE__, "Steering_kd", parameter_configuration.steering_kd);
     Logger::log(DEBUG, __FILE__, "Speed_kp", parameter_configuration.speed_kp);
     Logger::log(DEBUG, __FILE__, "Speed_ki", parameter_configuration.speed_ki);
-    Logger::log(DEBUG, __FILE__, "Turn_kp", parameter_configuration.turn_kp);
     Logger::log(DEBUG, __FILE__, "Turn_kd", parameter_configuration.turn_kd);
+    Logger::log(DEBUG, __FILE__, "Angle_offset", parameter_configuration.angle_offset);
     return parameter_configuration;
 }
 

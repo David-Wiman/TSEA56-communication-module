@@ -32,7 +32,7 @@ public:
     void write_regulation_constants(
             int steeringKP, int steeringKD,
             int speedKP, int speedKI,
-            int turnKP, int turnKD);
+            int turnKD, int angleOffset);
     void write_regulation_constants(ParameterConfiguration const& params);
     void throttle(unsigned max_fps);
 
