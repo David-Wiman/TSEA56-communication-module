@@ -96,7 +96,7 @@ void Connection::read() {
                 parameter_configuration = config;
             } else if (exists(j, "MapData")) {
                 std::lock_guard<std::mutex> lk(mtx);
-                // Update control-center's map, how?
+                json map_json{std::move(j)};
             }
         } catch (const boost::exception&) {
             Logger::log(ERROR, __FILE__, "read", "Connection lost");

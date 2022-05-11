@@ -110,7 +110,9 @@ int main() {
             
             case drive_mode::full_auto:
                 {
-
+                    image_data = image_processor.get_next_image_data();
+                    reference = control_center(sensor_data, image_data);
+                    com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
                 }
                 break;
 
