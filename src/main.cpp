@@ -102,32 +102,41 @@ int main() {
                 break;
 
             case drive_mode::semi_auto:
-                {
-                    image_data = image_processor.get_next_image_data();
-                    if (image_data.status_code == 2) {
-                        Logger::log(ERROR, __FILE__, "Image processor error count", ++image_error_counter);
-                    } else {
-                        image_error_counter = 0;
-                        reference = control_center(sensor_data, image_data);
-                        com.write_auto_instruction(reference, min(sensor_data.speed, 700), image_data.lateral_position);
-                        string finished_instruction_id = control_center.get_finished_instruction_id();
-                        if (finished_instruction_id != "") {
-                            Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
-                            connection.send_instruction_id(finished_instruction_id);
-                        }
+                image_data = image_processor.get_next_image_data();
+                if (image_data.status_code == 2) {
+                    Logger::log(ERROR, __FILE__,
+                        "Image processor error count", ++image_error_counter);
+                } else {
+                    image_error_counter = 0;
+                    reference = control_center(sensor_data, image_data);
+                    com.write_auto_instruction(
+                            reference, min(sensor_data.speed, 1000),
+                            image_data.lateral_position
+                        );
+                    if (control_center.finished_instruction()) {
+                        string instruction_id = control_center.get_finished_instruction_id();
+                        Logger::log(INFO, __FILE__, "Finished instruction: ", instruction_id);
+                        connection.write_formated("InstructionId", instruction_id);
                     }
                 }
                 break;
 
             case drive_mode::full_auto:
-                {
-                    image_data = image_processor.get_next_image_data();
+                image_data = image_processor.get_next_image_data();
+                if (image_data.status_code == 2) {
+                    Logger::log(ERROR, __FILE__,
+                        "Image processor error count", ++image_error_counter);
+                } else {
+                    image_error_counter = 0;
                     reference = control_center(sensor_data, image_data);
-                    com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
-                    string finished_instruction_id = control_center.get_finished_instruction_id();
-                    if (finished_instruction_id != "") {
-                        Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
-                        connection.write(control_center.get_current_road_segment());
+                    com.write_auto_instruction(
+                            reference, min(sensor_data.speed, 1000),
+                            image_data.lateral_position
+                        );
+                    if (control_center.finished_instruction()) {
+                        string instruction_id = control_center.get_finished_instruction_id();
+                        Logger::log(INFO, __FILE__, "Finished instruction: ", instruction_id);
+                        connection.write_formated("Position", instruction_id);
                     }
                 }
                 break;

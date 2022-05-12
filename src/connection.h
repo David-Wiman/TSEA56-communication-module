@@ -28,6 +28,9 @@ public:
     /* Sends a string to the client */
     void write(const std::string& response);
 
+    /* Send a string but formated as json. */
+    void write_formated(std::string const &label, std::string const &message);
+
     /* Sends a instruction id to client */
     void send_instruction_id(const std::string& id);
 

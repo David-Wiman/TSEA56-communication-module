@@ -116,6 +116,12 @@ void Connection::write(const std::string& response) {
     boost::asio::write( socket, boost::asio::buffer(msg));
 }
 
+void Connection::write_formated(string const &label, string const &message) {
+    ostringstream oss{};
+    oss << "{\"" << label << "\":\"" << message << "\"}\n";
+    boost::asio::write(socket, boost::asio::buffer(oss.str()));
+}
+
 void Connection::send_instruction_id(const std::string& id) {
     std::ostringstream oss;
     oss << "{\"InstructionId\": \"" << id << "\"}" ;
