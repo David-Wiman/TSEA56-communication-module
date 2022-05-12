@@ -6,6 +6,7 @@
 #include "log.h"
 
 using namespace boost::asio;
+using namespace std;
 using ip::tcp;
 using std::cout;
 using std::endl;
@@ -19,9 +20,9 @@ bool exists(const json& j, const std::string& key) {
 Connection::Connection(int port)
 : port{port}, io_service{}, acceptor{io_service, tcp::endpoint(tcp::v4(), port)},
   socket{io_service}, parameters{false}, manual_instruction{false},
-  semi_instruction{false}, auto_instruction{false}, emergency_stop{false},
+  semi_instruction{false}, auto_instruction{false}, map_data{false}, emergency_stop{false},
   lost_connection{false}, parameter_configuration{}, manual_drive_instruction{},
-  semi_drive_instruction{}, auto_drive_instruction{}, thread{}, mtx{} {
+  semi_drive_instruction{}, drive_mission{}, map{}, thread{}, mtx{} {
     acceptor.accept(socket);
     Logger::log(INFO, __FILE__, "Connection", "Connection established");
     thread = new std::thread(&Connection::read, this);
@@ -84,16 +85,20 @@ void Connection::read() {
                 semi_instruction.store(true);
                 SemiDriveInstruction inst{j};
                 semi_drive_instruction = inst;
-            } else if (exists(j, "AutoDriveInstruction")) {
+            } else if (exists(j, "DriveMission")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 auto_instruction.store(true);
-                AutoDriveInstruction inst{j};
-                auto_drive_instruction = inst;
+                DriveMission inst{j};
+                drive_mission = inst;                
             } else if (exists(j, "ParameterConfiguration")) {
                 std::lock_guard<std::mutex> lk(mtx);
                 parameters.store(true);
                 ParameterConfiguration config{j};
                 parameter_configuration = config;
+            } else if (exists(j, "MapData")) {
+                std::lock_guard<std::mutex> lk(mtx);
+                map_data.store(true);
+                map = j;
             }
         } catch (const boost::exception&) {
             Logger::log(ERROR, __FILE__, "read", "Connection lost");
@@ -141,6 +146,10 @@ bool Connection::new_auto_instruction() {
     return auto_instruction.load();
 }
 
+bool Connection::new_map() {
+    return map_data.load();
+}
+
 /* Getters, sets new-values to false*/
 ParameterConfiguration Connection::get_parameter_configuration() {
     std::lock_guard<std::mutex> lk(mtx);
@@ -170,8 +179,14 @@ SemiDriveInstruction Connection::get_semi_drive_instruction() {
     return semi_drive_instruction;
 }
 
-AutoDriveInstruction Connection::get_auto_drive_instruction() {
+DriveMission Connection::get_drive_mission() {
     std::lock_guard<std::mutex> lk(mtx);
     auto_instruction.store(false);
-    return auto_drive_instruction;
+    return drive_mission;
+}
+
+json Connection::get_map() {
+    std::lock_guard<std::mutex> lk(mtx);
+    map_data.store(false);
+    return map;
 }

@@ -79,10 +79,18 @@ int main() {
             stringstream ss{};
             ss << instruction;
             Logger::log(INFO, __FILE__, "New (semi-auto) instruction", ss.str());
-
             control_center.add_drive_instruction(instruction.as_drive_instruction());
+        } else if (connection.new_auto_instruction()) {
+            mode = drive_mode::full_auto;
+            DriveMission instruction = connection.get_drive_mission();
+            control_center.update_list_of_target_nodes(instruction.get_target_nodes());
+            Logger::log(INFO, __FILE__, "New (full-auto) instruction", "");
+        } else if (connection.new_map()) {
+            json mapdata = connection.get_map();
+            control_center.update_map(mapdata);
+            Logger::log(INFO, __FILE__, "New map recieved", mapdata.dump());
         } else {
-            //cout << "No new instruction" << endl;
+            // No new instruction
         }
 
         switch (mode) {
@@ -100,6 +108,14 @@ int main() {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
                         connection.send_instruction_id(finished_instruction_id);
                     }
+                }
+                break;
+            
+            case drive_mode::full_auto:
+                {
+                    image_data = image_processor.get_next_image_data();
+                    reference = control_center(sensor_data, image_data);
+                    com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
                 }
                 break;
 

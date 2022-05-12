@@ -48,6 +48,9 @@ public:
     /* Returns 'true' if a new manual instruction has been recieved*/
     bool new_auto_instruction();
 
+    /* Returns 'true' if a new map has been recieved*/
+    bool new_map();
+
     /* Returns latest ParameterConfiguration recieved and resets new_parameters */
     ParameterConfiguration get_parameter_configuration();
 
@@ -57,8 +60,12 @@ public:
     /* Returns latest SemiDriveInstruction recieved and resets new_semi_instruction */
     SemiDriveInstruction get_semi_drive_instruction();
 
-    /* Returns latest AutoDriveInstruction recieved and resets new_auto_instruction */
-    AutoDriveInstruction get_auto_drive_instruction();
+    /* Returns latest DriveMission recieved and resets new_auto_instruction */
+    DriveMission get_drive_mission();
+
+    /* Returns latest map recieved and resets new_map */
+    json get_map();
+
 
 private:
     void read();
@@ -75,6 +82,7 @@ private:
     std::atomic<bool> manual_instruction;
     std::atomic<bool> semi_instruction;
     std::atomic<bool> auto_instruction;
+    std::atomic<bool> map_data;
 
     std::atomic<bool> emergency_stop;
     std::atomic<bool> lost_connection;
@@ -83,7 +91,8 @@ private:
     ParameterConfiguration parameter_configuration;
     ManualDriveInstruction manual_drive_instruction;
     SemiDriveInstruction semi_drive_instruction;
-    AutoDriveInstruction auto_drive_instruction;
+    DriveMission drive_mission;
+    json map;
 
     /* Threading */
     std::thread *thread;
