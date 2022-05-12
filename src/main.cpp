@@ -17,6 +17,8 @@ extern "C" {
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
 
+#define MAX_IMAGE_ERRORS 10
+
 using namespace std;
 using json = nlohmann::json;
 using steady_clock = chrono::steady_clock;
@@ -45,6 +47,7 @@ int main() {
     com.write_regulation_constants(100, 150, 2, 2, 150, 1610);
 
     int elapsed_time{0};
+    int image_error_counter{0};
 
     while (true) {
 
@@ -101,12 +104,17 @@ int main() {
             case drive_mode::semi_auto:
                 {
                     image_data = image_processor.get_next_image_data();
-                    reference = control_center(sensor_data, image_data);
-                    com.write_auto_instruction(reference, min(sensor_data.speed, 700), image_data.lateral_position);
-                    string finished_instruction_id = control_center.get_finished_instruction_id();
-                    if (finished_instruction_id != "") {
-                        Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
-                        connection.send_instruction_id(finished_instruction_id);
+                    if (image_data.status_code == 2) {
+                        Logger::log(ERROR, __FILE__, "Image processor error count", ++image_error_counter);
+                    } else {
+                        image_error_counter = 0;
+                        reference = control_center(sensor_data, image_data);
+                        com.write_auto_instruction(reference, min(sensor_data.speed, 700), image_data.lateral_position);
+                        string finished_instruction_id = control_center.get_finished_instruction_id();
+                        if (finished_instruction_id != "") {
+                            Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+                            connection.send_instruction_id(finished_instruction_id);
+                        }
                     }
                 }
                 break;
@@ -117,7 +125,6 @@ int main() {
                     reference = control_center(sensor_data, image_data);
                     com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
                     string finished_instruction_id = control_center.get_finished_instruction_id();
-                    string current_road_segment = control_center.get_current_road_segment();
                     if (finished_instruction_id != "") {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
                         connection.write(control_center.get_current_road_segment());
@@ -139,9 +146,16 @@ int main() {
 
         connection.write(drivedata.format_json());
 
+        if (image_error_counter > MAX_IMAGE_ERRORS) {
+            Logger::log(ERROR, __FILE__, "Image processor error", "Abort");
+            break;
+        }
+
         com.throttle(100);
     }
 
+    Logger::log(INFO, __FILE__, "Main", "Closing main");
+    com.write_manual_instruction(0, 0);
     return 0;
 }
 
