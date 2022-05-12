@@ -117,8 +117,10 @@ int main() {
                     reference = control_center(sensor_data, image_data);
                     com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
                     string finished_instruction_id = control_center.get_finished_instruction_id();
+                    string current_road_segment = control_center.get_current_road_segment();
                     if (finished_instruction_id != "") {
                         Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+                        connection.write(control_center.get_current_road_segment());
                     }
                 }
                 break;
