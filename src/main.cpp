@@ -82,8 +82,8 @@ int main() {
             control_center.add_drive_instruction(instruction.as_drive_instruction());
         } else if (connection.new_auto_instruction()) {
             mode = drive_mode::full_auto;
-            DriveMission instruction = connection.get_drive_mission();
-            control_center.update_list_of_target_nodes(instruction.get_target_nodes());
+            DriveMission missions = connection.get_drive_mission();
+            control_center.set_drive_missions(missions.get_target_nodes());
             Logger::log(INFO, __FILE__, "New (full-auto) instruction", "");
         } else if (connection.new_map()) {
             json mapdata = connection.get_map();
@@ -110,12 +110,16 @@ int main() {
                     }
                 }
                 break;
-            
+
             case drive_mode::full_auto:
                 {
                     image_data = image_processor.get_next_image_data();
                     reference = control_center(sensor_data, image_data);
                     com.write_auto_instruction(reference, sensor_data.speed, image_data.lateral_position);
+                    string finished_instruction_id = control_center.get_finished_instruction_id();
+                    if (finished_instruction_id != "") {
+                        Logger::log(INFO, __FILE__, "Finished instruction: ", finished_instruction_id);
+                    }
                 }
                 break;
 
