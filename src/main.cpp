@@ -136,7 +136,7 @@ int main() {
                     if (control_center.finished_instruction()) {
                         string instruction_id = control_center.get_finished_instruction_id();
                         Logger::log(INFO, __FILE__, "Finished instruction: ", instruction_id);
-                        connection.write_formated("Position", instruction_id);
+                        connection.write_formated("Position", control_center.get_current_road_segment());
                     }
                 }
                 break;
