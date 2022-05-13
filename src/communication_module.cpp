@@ -35,14 +35,14 @@ void CommunicationModule::write_manual_instruction(uint16_t throttle, int16_t st
 
 
 void CommunicationModule::write_auto_instruction(
-        reference_t ref, uint16_t speed, int16_t lat) {
+        control_t control_data, uint16_t speed) {
     Logger::log(DEBUG, __FILE__, "COM", "Writing auto instruction");
     uint16_t data[] = {
         STEERING_CUR_VEL, package_signed(speed),
-        STEERING_REF_VEL, package_signed(ref.speed),
-        STEERING_CUR_ANG, package_signed(ref.angle),
-        STEERING_CUR_LAT, package_signed(lat),
-        STEERING_REGULATION_MODE, package_signed(ref.regulation_mode)
+        STEERING_REF_VEL, package_signed(control_data.speed_ref),
+        STEERING_CUR_ANG, package_signed(control_data.angle),
+        STEERING_CUR_LAT, package_signed(control_data.lateral_position),
+        STEERING_REGULATION_MODE, package_signed(control_data.regulation_mode)
     };
     i2c_set_slave_addr(STEERING_MODULE_SLAVE_ADDRESS);
     int len = i2c_write(data, sizeof(data)/sizeof(uint16_t));

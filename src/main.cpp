@@ -40,7 +40,7 @@ int main() {
     sensor_data_t sensor_data{};
     steer_data_t steer_data{};
     image_proc_t image_data{};
-    reference_t reference{};
+    control_t control_data{};
 
     drive_mode::DriveMode mode{drive_mode::manual};
 
@@ -108,10 +108,9 @@ int main() {
                         "Image processor error count", ++image_error_counter);
                 } else {
                     image_error_counter = 0;
-                    reference = control_center(sensor_data, image_data);
+                    control_data = control_center(sensor_data, image_data);
                     com.write_auto_instruction(
-                            reference, min(sensor_data.speed, 1000),
-                            image_data.lateral_position
+                            control_data, min(sensor_data.speed, 1000)
                         );
                     if (control_center.finished_instruction()) {
                         string instruction_id = control_center.get_finished_instruction_id();
@@ -128,10 +127,9 @@ int main() {
                         "Image processor error count", ++image_error_counter);
                 } else {
                     image_error_counter = 0;
-                    reference = control_center(sensor_data, image_data);
+                    control_data = control_center(sensor_data, image_data);
                     com.write_auto_instruction(
-                            reference, min(sensor_data.speed, 1000),
-                            image_data.lateral_position
+                            control_data, min(sensor_data.speed, 1000)
                         );
                     if (control_center.finished_instruction()) {
                         string instruction_id = control_center.get_finished_instruction_id();
@@ -151,7 +149,7 @@ int main() {
 
         DriveData drivedata = DriveData(
                 elapsed_time, steer_data, sensor_data,
-                image_data.lateral_position, reference.angle);
+                control_data.lateral_position, control_data.angle);
 
         connection.write(drivedata.format_json());
 

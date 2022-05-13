@@ -28,7 +28,7 @@ public:
     void read_sensor_data(sensor_data_t &sensor_data);
     void read_steer_data(steer_data_t &steer_data);
     void write_manual_instruction(uint16_t throttle, int16_t steering);
-    void write_auto_instruction(reference_t ref, uint16_t speed, int16_t lateral_position);
+    void write_auto_instruction(control_t control_data, uint16_t speed);
     void write_regulation_constants(
             int steeringKP, int steeringKD,
             int speedKP, int speedKI,
