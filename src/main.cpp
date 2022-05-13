@@ -35,7 +35,7 @@ int main() {
 
     ImageProcessing image_processor{"image-processing-module/", false};
     CommunicationModule com{};
-    ControlCenter control_center{3, 3, 5, 2};
+    ControlCenter control_center{3, 3, 5, 2, 4};
 
     sensor_data_t sensor_data{};
     steer_data_t steer_data{};
