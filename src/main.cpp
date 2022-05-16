@@ -48,6 +48,7 @@ int main() {
 
     int elapsed_time{0};
     int image_error_counter{0};
+    unsigned program_counter{0};
 
     while (true) {
 
@@ -69,7 +70,8 @@ int main() {
             com.write_regulation_constants(params);
         }
 
-        com.read_sensor_data(sensor_data);
+        if (program_counter % 2)
+            com.read_sensor_data(sensor_data);
 
         if (connection.new_manual_instruction()) {
             mode = drive_mode::manual;
@@ -159,6 +161,7 @@ int main() {
         }
 
         com.throttle(100);
+        ++program_counter;
     }
 
     Logger::log(INFO, __FILE__, "Main", "Closing main");
