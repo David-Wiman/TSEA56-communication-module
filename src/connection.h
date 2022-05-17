@@ -78,6 +78,7 @@ private:
     boost::asio::io_service io_service;
     boost::asio::ip::tcp::acceptor acceptor;
     boost::asio::ip::tcp::socket socket;
+    std::atomic<bool> reading{true};
 
 
     /* Variables to check if a new response has come */

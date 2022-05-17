@@ -30,6 +30,7 @@ Connection::Connection(int port)
 
 Connection::~Connection() {
     Logger::log(INFO, __FILE__, "Connection", "Connection terminated");
+    reading.store(false);
     thread->join();
     delete thread;
 }
@@ -43,7 +44,7 @@ void Connection::restart() {
 
 /* Recieve a string from the client, set new_instruction, create instruction object */
 void Connection::read() {
-    while (true) {
+    while (reading.load()) {
         try {
             // Continuously read until newline, create json object from string
             boost::asio::streambuf buf;
