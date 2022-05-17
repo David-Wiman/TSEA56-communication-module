@@ -44,7 +44,7 @@ int main() {
 
     drive_mode::DriveMode mode{drive_mode::manual};
 
-    com.write_regulation_constants(100, 130, 2, 1, 90, 1630);
+    com.write_regulation_constants(100, 130, 2, 1, 150, 1630);
 
     int elapsed_time{0};
     int image_error_counter{0};
